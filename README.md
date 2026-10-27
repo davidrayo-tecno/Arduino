@@ -4,7 +4,7 @@ Simulador educativo de **Arduino UNO R3**. El alumnado escribe código C/C++ rea
 
 Autor: David Rayo Torres · IES Palomares
 
-**Abrir la aplicación:** https://davidrayo-tecno.github.io/arduino/
+**Abrir la aplicación:** https://davidrayo-tecno.github.io/Arduino/
 
 > Versión de prueba: **Fase 1**.
 
