@@ -47,6 +47,12 @@ body{
   overflow-x:hidden;
 }
 .stage{width:100%;max-width:1040px;position:relative}
+.scaler{transition:transform .55s cubic-bezier(.4,0,.2,1)}
+body.single .stage{clip-path:inset(-60px 0 -90px 0)}
+body.single{padding-block:12px;gap:14px}
+body.single .controls{gap:10px}
+body.single .controls button{padding:9px 14px}
+body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
 .scaler{position:absolute;left:50%;top:0;transform-origin:top center}
 
 .book{position:relative;width:920px;height:620px;perspective:2600px}
@@ -217,7 +223,7 @@ body{
   <button id="next" type="button">Siguiente ›</button>
   <button id="snd" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="sndtxt">Sonido</span></button>
 </div>
-<p class="hint">Arrastra una página para pasarla, haz clic en ella o usa las flechas del teclado</p>
+<p class="hint" id="hint">Arrastra una página para pasarla, haz clic en ella o usa las flechas del teclado</p>
 
 <script>
 (function(){
@@ -452,6 +458,10 @@ body{
     }catch(e){}
   }
 
+  // Modo una página (móvil): se ve media doble página y la vista se desplaza entre izquierda y derecha
+  const stage=document.getElementById('stage'), scaler=document.getElementById('scaler');
+  let single=false, side='R', scale=1;
+
   function render(){
     zfix();
     book.classList.toggle('closed-front', current===0);
@@ -462,86 +472,113 @@ body{
     const st=document.getElementById('status');
     if(current===0) st.textContent='Portada';
     else if(current===N) st.textContent='Contraportada';
-    else if(current===1) st.textContent='Índice';
-    else if(current-2 < words.length) st.textContent = words[current-2].w.charAt(0).toUpperCase()+words[current-2].w.slice(1);
+    else if(current===1) st.textContent= single && side==='L' ? 'Guarda' : 'Índice';
+    else if(current-2 < words.length){
+      const w=words[current-2].w; st.textContent = w.charAt(0).toUpperCase()+w.slice(1) + (single ? (side==='L' ? ' · definición' : ' · ejemplo') : '');
+    }
     else st.textContent='Fin';
     document.getElementById('prev').disabled = current===0;
     document.getElementById('next').disabled = current===N;
+    position();
   }
   function flip(dir,fast){
     const idx = dir>0 ? current : current-1;
     if(idx<0||idx>=N) return false;
     const L=leaves[idx], dur = fast ? 650 : 1150;
-    current += dir; render();
+    current += dir;
+    if(single) side = dir>0 ? 'L' : 'R';
+    render();
     L.dir=dir; lift(L);
     paperSound(fast, dur/1000*.9);
     animate(L, dir>0?1:0, dur, easeInOut, ()=>land(L));
     return true;
   }
+  function next(){
+    if(single){
+      if(current===N) return;
+      if(side==='L' && current>0){ side='R'; render(); return; }
+    }
+    flip(1);
+  }
+  function prev(){
+    if(single){
+      if(current===0) return;
+      if(side==='R' && current<N){ side='L'; render(); return; }
+    }
+    flip(-1);
+  }
   let jumping=null;
   function goTo(target){
     clearInterval(jumping);
-    if(target===current) return;
+    if(target===current){ if(single){ side='L'; render(); } return; }
     const dir = target>current ? 1 : -1;
-    flip(dir,true);
-    jumping=setInterval(()=>{ if(current===target || !flip(dir,true)) clearInterval(jumping); }, 150);
+    const step=()=>{ const ok=flip(dir,true); if(single && current===target) { side='L'; render(); } return ok; };
+    step();
+    jumping=setInterval(()=>{ if(current===target || !step()) clearInterval(jumping); }, 150);
   }
 
-  // Arrastrar la hoja con ratón o dedo
+  // Arrastrar o tocar: arrastrar a la izquierda avanza, a la derecha retrocede
   let drag=null;
   book.addEventListener('pointerdown', e=>{
     if(e.button>0 || e.target.closest('[data-go]')) return;
-    const el=e.target.closest('.leaf'); if(!el) return;
-    const i=leaves.findIndex(L=>L.el===el);
-    const dir = i===current ? 1 : i===current-1 ? -1 : 0;
-    if(!dir || leaves[i].active) return;
     clearInterval(jumping);
-    const L=leaves[i];
-    drag={L,dir,x0:e.clientX,y0:e.clientY,moved:false,w:book.getBoundingClientRect().width};
-    L.dir=dir; lift(L);
+    drag={x0:e.clientX,y0:e.clientY,decided:false,L:null,dir:0,w:book.getBoundingClientRect().width};
     try{ book.setPointerCapture(e.pointerId); }catch(_){}
   });
   book.addEventListener('pointermove', e=>{
     if(!drag) return;
-    const dx=e.clientX-drag.x0;
-    if(!drag.moved && Math.abs(dx)>6) drag.moved=true;
-    if(!drag.moved) return;
-    const span=drag.w*.85;
+    const dx=e.clientX-drag.x0, dy=e.clientY-drag.y0;
+    if(!drag.decided){
+      if(Math.abs(dx)<8) return;
+      if(Math.abs(dy)>Math.abs(dx)*1.2){ drag=null; return; }   // gesto vertical: dejar hacer scroll
+      drag.decided=true;
+      const dir = dx<0 ? 1 : -1;
+      if(single && dir>0 && side==='L' && current>0 && current<N){ drag=null; next(); return; }
+      if(single && dir<0 && side==='R' && current>0 && current<N){ drag=null; prev(); return; }
+      const idx = dir>0 ? current : current-1;
+      if(idx<0 || idx>=N || leaves[idx].active){ drag=null; return; }
+      drag.dir=dir; drag.L=leaves[idx]; drag.L.dir=dir; lift(drag.L);
+    }
+    const span = single ? drag.w*.42 : drag.w*.85;
     const p = drag.dir>0 ? -dx/span : 1-dx/span;
     setLeaf(drag.L, Math.max(0,Math.min(1,p)));
   });
-  function endDrag(cancel){
+  function endDrag(e,cancel){
     if(!drag) return;
-    const {L,dir,moved}=drag; drag=null;
-    if(!moved && !cancel){
-      // clic sin arrastrar: pasar la hoja completa
-      current+=dir; render();
-      paperSound(false,1.05);
-      animate(L, dir>0?1:0, 1150, easeInOut, ()=>land(L));
+    const d=drag; drag=null;
+    if(!d.decided){
+      if(cancel) return;
+      // toque: lado izquierdo retrocede, lado derecho avanza
+      const r = single ? stage.getBoundingClientRect() : book.getBoundingClientRect();
+      const x = (e.clientX - r.left)/r.width;
+      if(x < (single ? .35 : .5)) prev(); else next();
       return;
     }
+    const {L,dir}=d;
     const prog = dir>0 ? L.p : 1-L.p;
     if(!cancel && prog>.22){
       const dur=250+600*(1-prog);
-      current+=dir; render();
+      current+=dir;
+      if(single) side = dir>0 ? 'L' : 'R';
+      render();
       paperSound(prog>.6, dur/1000*.9);
       animate(L, dir>0?1:0, dur, easeOut, ()=>land(L));
     } else {
       animate(L, dir>0?0:1, 320, easeOut, ()=>land(L));
     }
   }
-  book.addEventListener('pointerup', ()=>endDrag(false));
-  book.addEventListener('pointercancel', ()=>endDrag(true));
+  book.addEventListener('pointerup', e=>endDrag(e,false));
+  book.addEventListener('pointercancel', e=>endDrag(e,true));
 
   book.addEventListener('click', e=>{
     const go=e.target.closest('[data-go]');
     if(go){ e.stopPropagation(); goTo(+go.dataset.go); }
   });
-  document.getElementById('next').addEventListener('click',()=>flip(1));
-  document.getElementById('prev').addEventListener('click',()=>flip(-1));
+  document.getElementById('next').addEventListener('click',next);
+  document.getElementById('prev').addEventListener('click',prev);
   document.addEventListener('keydown',e=>{
-    if(e.key==='ArrowRight') flip(1);
-    if(e.key==='ArrowLeft') flip(-1);
+    if(e.key==='ArrowRight') next();
+    if(e.key==='ArrowLeft') prev();
   });
   const sndBtn=document.getElementById('snd');
   sndBtn.addEventListener('click',()=>{
@@ -552,15 +589,32 @@ body{
   });
   leaves.forEach((L,i)=>setLeaf(L, i<current?1:0));
 
-  const stage=document.getElementById('stage'), scaler=document.getElementById('scaler');
+  function position(){
+    let off=0;
+    if(single){
+      if(current===0) side='R';
+      if(current===N) side='L';
+      off = side==='L' ? 230 : -230;
+    }
+    scaler.style.transform=`translateX(-50%) translateY(${12*scale}px) scale(${scale}) translateX(${off}px)`;
+  }
   function fit(){
-    const W=920+48, H=620+70;
-    const s=Math.max(.3,Math.min(1, stage.clientWidth/W, (window.innerHeight-150)/H));
-    scaler.style.transform=`translateX(-50%) translateY(${12*s}px) scale(${s})`;
-    stage.style.height=(H*s)+'px';
+    const H=620+70, avail=window.innerHeight-170;
+    const two=Math.min(1, stage.clientWidth/(920+48), avail/H);
+    const one=Math.min(1.15, stage.clientWidth/(460+28), Math.max(avail,420)/H);
+    const wasSingle=single;
+    single = one > two*1.35;           // pantallas estrechas: una página
+    if(single && !wasSingle) side = current===0 ? 'R' : (current===N ? 'L' : 'R');
+    scale = single ? one : Math.max(.3,two);
+    document.body.classList.toggle('single', single);
+    stage.style.height=(H*scale)+'px';
+    document.getElementById('hint').textContent = single
+      ? 'Toca el borde derecho o izquierdo, o desliza el dedo para pasar página'
+      : 'Arrastra una página para pasarla, haz clic en ella o usa las flechas del teclado';
+    render();
   }
   window.addEventListener('resize',fit);
-  fit(); render();
+  fit();
 })();
 </script>
 
