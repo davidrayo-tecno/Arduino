@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Pequeño Diccionario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&display=swap">
+<style>
+/* Layout: diccionario de tela verde con cantos dorados sobre un escritorio; cada palabra ocupa una doble página (izquierda definición, derecha ilustración y ejemplo) */
+:root{
+  --desk:#e7e3dc;
+  --desk-2:#d8d2c7;
+  --ink:#2b2a27;
+  --muted:#6e6a62;
+  --cloth:#1f3b33;
+  --cloth-2:#162c26;
+  --gold:#c8a55a;
+  --gold-ink:#9a7a32;
+  --paper:#fbf9f4;
+  --paper-edge:#e9e4d8;
+  --page-ink:#2d2a24;
+  --page-muted:#8a8172;
+  --endpaper:#d9cdb3;
+  --btn:#ffffff;
+  --btn-line:#cfc8bb;
+  --font-display:"Cormorant SC","Cormorant Garamond",Georgia,serif;
+  --font-serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --font-ui:"Jost",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --desk:#1d1c1a;--desk-2:#141311;--ink:#ece7dd;--muted:#a39d91;
+  --btn:#2a2825;--btn-line:#44403a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#1d1c1a;--desk-2:#141311;--ink:#ece7dd;--muted:#a39d91;
+  --btn:#2a2825;--btn-line:#44403a;color-scheme:dark}
+
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 90% at 50% 35%,var(--desk) 0%,var(--desk-2) 100%);
+  color:var(--ink);font-family:var(--font-ui);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:24px;box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  overflow-x:hidden;
+}
+.stage{width:100%;max-width:1040px;position:relative}
+.scaler{position:absolute;left:50%;top:0;transform-origin:top center}
+
+.book{position:relative;width:920px;height:620px;perspective:2600px}
+.shadow{
+  position:absolute;left:4%;right:4%;bottom:-34px;height:50px;
+  background:radial-gradient(closest-side,rgba(0,0,0,.35),transparent);
+  filter:blur(6px);transition:left .9s,right .9s;
+}
+.book.closed-front .shadow{left:52%}
+.book.closed-back .shadow{right:52%}
+.board{
+  position:absolute;top:-10px;bottom:-10px;width:calc(50% + 12px);
+  background:linear-gradient(90deg,var(--cloth-2),var(--cloth));
+  transition:opacity .4s;
+}
+.board.left{left:-12px;border-radius:5px 2px 2px 5px}
+.board.right{right:-12px;border-radius:2px 5px 5px 2px;background:linear-gradient(270deg,var(--cloth-2),var(--cloth))}
+.book.closed-front .board.left,.book.closed-back .board.right{opacity:0}
+.stack{
+  position:absolute;top:2px;bottom:-2px;
+  background:repeating-linear-gradient(90deg,var(--paper) 0 1px,var(--paper-edge) 1px 2px);
+  transition:width .9s;
+}
+.stack.left{right:50%;margin-right:460px;width:var(--ls,0px);border-radius:2px 0 0 2px}
+.stack.right{left:50%;margin-left:460px;width:var(--rs,0px);border-radius:0 2px 2px 0}
+
+.book{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.leaf{position:absolute;top:0;left:50%;width:460px;height:620px;transform-style:preserve-3d;cursor:grab}
+.leaf.active{cursor:grabbing}
+.seg{position:absolute;top:0;height:100%;transform-origin:left center;transform-style:preserve-3d;will-change:transform}
+.face{
+  position:absolute;top:0;left:0;height:100%;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;
+}
+.face.back{transform:rotateY(180deg)}
+.content{position:absolute;top:0;width:460px;height:620px;background:var(--paper);color:var(--page-ink)}
+.sh{position:absolute;inset:0;background:#1a1408;opacity:0;pointer-events:none}
+.page{
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(rgba(120,100,60,.035) 1px,transparent 1.2px),
+    radial-gradient(rgba(120,100,60,.03) 1px,transparent 1.2px);
+  background-size:7px 7px,11px 11px;background-position:0 0,3px 5px;
+}
+.content.page::before{content:"";position:absolute;top:0;bottom:0;width:70px;pointer-events:none}
+.front .content.page::before{left:0;background:linear-gradient(90deg,rgba(60,45,20,.22),rgba(60,45,20,.06) 35%,transparent)}
+.back .content.page::before{right:0;background:linear-gradient(270deg,rgba(60,45,20,.22),rgba(60,45,20,.06) 35%,transparent)}
+
+/* contenido de página */
+.inner{position:absolute;inset:44px 50px 56px;display:flex;flex-direction:column}
+.back .inner{inset:44px 58px 56px 50px}
+.front .inner{inset:44px 50px 56px 58px}
+.runhead{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--font-display);font-size:13px;letter-spacing:.22em;color:var(--page-muted);
+  border-bottom:1px solid #d9d1c0;padding-bottom:8px;
+}
+.runhead b{font-weight:700;color:var(--gold-ink);font-size:15px}
+.folio{
+  position:absolute;bottom:24px;font-family:var(--font-serif);font-style:italic;
+  font-size:15px;color:#a49c8a;font-variant-numeric:oldstyle-nums;
+}
+.front .folio{right:40px}.back .folio{left:40px}
+
+.entry{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.initial{font-family:var(--font-display);font-size:120px;line-height:.8;color:var(--gold);opacity:.35;margin:0 0 -18px}
+.word{font-family:var(--font-display);font-weight:700;font-size:64px;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;font-family:var(--font-serif);font-size:19px;color:var(--page-muted)}
+.meta .syl{letter-spacing:.06em}
+.meta .cat{font-style:italic;color:var(--gold-ink)}
+.rule{width:56px;height:1px;background:var(--gold);margin:4px 0}
+.def{font-family:var(--font-serif);font-size:23px;line-height:1.4;margin:0;max-width:30ch}
+.def .n{font-weight:600;color:var(--gold-ink);margin-right:6px}
+.etym{font-family:var(--font-serif);font-style:italic;font-size:17px;color:var(--page-muted);margin:6px 0 0;line-height:1.4}
+.etym::before{content:"Etim. ";font-style:normal;font-family:var(--font-display);letter-spacing:.12em;font-size:13px;color:var(--gold-ink)}
+
+.illus{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.plate{
+  width:100%;max-width:300px;aspect-ratio:300/250;
+  border:1px solid #d9d1c0;outline:1px solid #e8e1d2;outline-offset:6px;
+  background:rgba(255,255,255,.45);display:grid;place-items:center;
+}
+.plate svg{width:88%;height:88%}
+.plate svg *{vector-effect:non-scaling-stroke}
+.fig{font-family:var(--font-display);font-size:12px;letter-spacing:.2em;color:var(--page-muted);margin-top:-10px}
+.example{border-top:1px solid #d9d1c0;padding-top:14px;width:100%}
+.example .lbl{font-family:var(--font-display);letter-spacing:.2em;font-size:12px;color:var(--gold-ink)}
+.example p{font-family:var(--font-serif);font-style:italic;font-size:22px;line-height:1.4;margin:6px 0 0}
+.example p em{font-style:normal;font-weight:600}
+
+/* índice */
+.index h2{font-family:var(--font-display);font-size:40px;margin:0 0 6px;font-weight:700}
+.index .sub{font-family:var(--font-serif);font-style:italic;color:var(--page-muted);font-size:18px;margin:0 0 22px}
+.index ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.index button{
+  all:unset;box-sizing:border-box;width:100%;cursor:pointer;
+  display:flex;align-items:baseline;gap:10px;padding:8px 4px;
+  font-family:var(--font-serif);font-size:24px;color:var(--page-ink);
+}
+.index button .dots{flex:1;border-bottom:1.5px dotted #c6bca6;transform:translateY(-6px)}
+.index button .pg{font-variant-numeric:tabular-nums oldstyle-nums;color:var(--page-muted);font-size:20px}
+.index button:hover .w,.index button:focus-visible .w{color:var(--gold-ink)}
+.index button:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+
+/* tapas */
+.cover{
+  background:
+    radial-gradient(rgba(255,255,255,.04) 1px,transparent 1.4px) 0 0/4px 4px,
+    linear-gradient(90deg,var(--cloth-2) 0,var(--cloth) 8%,var(--cloth) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  color:var(--gold);border-radius:2px 6px 6px 2px;
+}
+.cover.backcover{background:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1.4px) 0 0/4px 4px,linear-gradient(270deg,var(--cloth-2) 0,var(--cloth) 8%,var(--cloth) 100%);border-radius:6px 2px 2px 6px}
+.cover .frame{position:absolute;inset:28px;border:1.5px solid var(--gold);opacity:.75;outline:1px solid var(--gold);outline-offset:-8px}
+.cover h1{font-family:var(--font-display);font-weight:700;font-size:54px;letter-spacing:.06em;margin:0;line-height:1;text-align:center}
+.cover p{font-family:var(--font-serif);font-style:italic;font-size:21px;margin:0;opacity:.9}
+.cover .orn{width:120px;height:14px}
+.cover .seal{filter:drop-shadow(0 1px 0 rgba(0,0,0,.45)) drop-shadow(0 -1px 0 rgba(255,235,180,.12))}
+.cover .logo{width:190px;height:190px;display:block}
+.cover .mark{font-family:var(--font-display);letter-spacing:.3em;font-size:14px;opacity:.85}
+.endpaper{
+  background:
+    radial-gradient(circle at 25% 25%,rgba(255,255,255,.35) 0 2px,transparent 2.5px) 0 0/28px 28px,
+    radial-gradient(circle at 75% 75%,rgba(110,85,40,.18) 0 2px,transparent 2.5px) 0 0/28px 28px,
+    var(--endpaper);
+}
+.endpaper .label{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:var(--paper);border:1px solid #b7a37a;padding:18px 28px;
+  font-family:var(--font-serif);font-style:italic;color:#7b6c4e;font-size:18px;text-align:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);white-space:nowrap;
+}
+.endpaper .label small{display:block;font-family:var(--font-display);font-style:normal;letter-spacing:.2em;font-size:11px;margin-top:6px;color:#9a8a68}
+
+.controls{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center}
+.controls button{
+  font-family:var(--font-ui);font-size:14px;color:var(--ink);background:var(--btn);
+  border:1px solid var(--btn-line);border-radius:999px;padding:9px 18px;cursor:pointer;
+  transition:transform .15s,border-color .15s;
+}
+.controls button:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
+.controls button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.controls button:disabled{opacity:.4;cursor:default}
+.status{font-family:var(--font-serif);font-size:19px;font-style:italic;color:var(--muted);min-width:170px;text-align:center}
+.hint{font-size:12px;color:var(--muted);letter-spacing:.04em;margin:0;text-align:center}
+
+.controls button[aria-pressed="false"]{color:var(--muted)}
+.controls button svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
+</style>
+
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="scaler" id="scaler">
+    <div class="book" id="book">
+      <div class="shadow"></div>
+      <div class="board left"></div>
+      <div class="board right"></div>
+      <div class="stack left"></div>
+      <div class="stack right"></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="prev" type="button">‹ Anterior</button>
+  <span class="status" id="status" aria-live="polite"></span>
+  <button id="next" type="button">Siguiente ›</button>
+  <button id="snd" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="sndtxt">Sonido</span></button>
+</div>
+<p class="hint">Arrastra una página para pasarla, haz clic en ella o usa las flechas del teclado</p>
+
+<script>
+(function(){
+  const G = '#1f3b33', A = '#b8913f', P = '#fbf9f4';
+
+  function gear(cx,cy,r,teeth,depth){
+    let d='';
+    const step = Math.PI*2/teeth;
+    for(let i=0;i<teeth;i++){
+      const a=i*step, pts=[[a,r],[a+step*.18,r+depth],[a+step*.5,r+depth],[a+step*.68,r]];
+      pts.forEach(([ang,rad],k)=>{ d+=(i===0&&k===0?'M':'L')+(cx+Math.cos(ang)*rad).toFixed(1)+' '+(cy+Math.sin(ang)*rad).toFixed(1)+' '; });
+      const b=a+step;
+      d+='A'+r+' '+r+' 0 0 1 '+(cx+Math.cos(b)*r).toFixed(1)+' '+(cy+Math.sin(b)*r).toFixed(1)+' ';
+    }
+    return d+'Z';
+  }
+
+  const art = {
+    algoritmo: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" font-family="Jost,sans-serif" font-size="13" text-anchor="middle">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${G}" stroke="none"/></marker></defs>
+      <rect x="105" y="8" width="90" height="30" rx="15" fill="${A}" fill-opacity=".18"/>
+      <text x="150" y="28" fill="${G}" stroke="none">Inicio</text>
+      <path d="M150 38V58" marker-end="url(#ar)"/>
+      <path d="M150 60L198 95L150 130L102 95Z" fill="${P}"/>
+      <text x="150" y="99" fill="${G}" stroke="none">¿Listo?</text>
+      <path d="M150 130V158" marker-end="url(#ar)"/>
+      <text x="162" y="148" fill="${A}" stroke="none" font-size="11">sí</text>
+      <path d="M198 95H226" marker-end="url(#ar)"/>
+      <text x="210" y="88" fill="${A}" stroke="none" font-size="11">no</text>
+      <rect x="228" y="80" width="64" height="30" rx="3" fill="${P}"/>
+      <text x="260" y="100" fill="${G}" stroke="none">Repetir</text>
+      <path d="M260 80V49H152" stroke-dasharray="4 4" marker-end="url(#ar)"/>
+      <rect x="105" y="160" width="90" height="30" rx="3" fill="${P}"/>
+      <text x="150" y="180" fill="${G}" stroke="none">Resolver</text>
+      <path d="M150 190V210" marker-end="url(#ar)"/>
+      <rect x="105" y="212" width="90" height="30" rx="15" fill="${G}"/>
+      <text x="150" y="232" fill="${P}" stroke="none">Fin</text>
+    </svg>`,
+    artefacto: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2">
+      <path d="${gear(118,120,58,12,12)}" fill="${A}" fill-opacity=".18"/>
+      <circle cx="118" cy="120" r="34"/><circle cx="118" cy="120" r="10" fill="${G}"/>
+      ${[0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3;return `<path d="M${(118+Math.cos(a)*10).toFixed(1)} ${(120+Math.sin(a)*10).toFixed(1)}L${(118+Math.cos(a)*34).toFixed(1)} ${(120+Math.sin(a)*34).toFixed(1)}"/>`}).join('')}
+      <path d="${gear(212,70,32,9,10)}" transform="rotate(10 212 70)" fill="${P}"/>
+      <circle cx="212" cy="70" r="8" fill="${G}"/>
+      <path d="${gear(216,180,26,8,9)}" fill="${P}"/>
+      <circle cx="216" cy="180" r="7" fill="${G}"/>
+      <path d="M40 228H270" stroke="${A}"/>
+    </svg>`,
+    fiable: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M150 22L222 50C222 135 194 188 150 218C106 188 78 135 78 50Z" fill="${A}" fill-opacity=".16"/>
+      <path d="M150 40L206 62C206 132 184 174 150 198C116 174 94 132 94 62Z"/>
+      <path d="M118 118L142 142L186 92" stroke-width="5" stroke="${G}"/>
+      <path d="M40 120h18M242 120h18M60 60l12 8M240 60l-12 8" stroke="${A}"/>
+    </svg>`,
+    obsoleto: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" stroke-linejoin="round">
+      <rect x="82" y="60" width="136" height="136" rx="6" fill="${A}" fill-opacity=".14"/>
+      <rect x="112" y="60" width="78" height="46" fill="${P}"/>
+      <rect x="162" y="68" width="16" height="30" fill="${G}"/>
+      <rect x="100" y="128" width="100" height="68" fill="${P}"/>
+      <path d="M112 146h76M112 162h76M112 178h50" stroke="${A}" stroke-width="1.5"/>
+      <path d="M82 60L136 60M82 60L82 112M82 60L122 90M82 60L104 104M82 60L130 74" stroke-width="1" stroke-opacity=".6"/>
+      <path d="M96 60Q92 70 82 72M110 60Q106 82 82 86M122 60Q118 92 82 100" stroke-width="1" stroke-opacity=".6"/>
+      <path d="M250 14V82" stroke-width="1"/>
+      <circle cx="250" cy="88" r="6" fill="${G}"/>
+      <path d="M244 86l-8-4M244 90l-8 4M256 86l8-4M256 90l8 4" stroke-width="1.2"/>
+      <path d="M60 214h180" stroke="${A}" stroke-dasharray="2 6"/>
+    </svg>`,
+    viable: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="232" cy="58" r="20" fill="${A}" fill-opacity=".3" stroke="${A}"/>
+      ${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<path stroke="${A}" d="M${(232+Math.cos(a)*28).toFixed(1)} ${(58+Math.sin(a)*28).toFixed(1)}L${(232+Math.cos(a)*38).toFixed(1)} ${(58+Math.sin(a)*38).toFixed(1)}"/>`}).join('')}
+      <path d="M40 206Q150 176 260 206Z" fill="${A}" fill-opacity=".22"/>
+      <path d="M40 206Q150 176 260 206"/>
+      <path d="M150 192C150 160 144 138 150 104"/>
+      <path d="M149 150C118 146 98 124 102 98C130 98 148 120 149 150Z" fill="${G}" fill-opacity=".85"/>
+      <path d="M150 128C176 126 198 104 200 78C172 78 152 100 150 128Z" fill="${P}"/>
+      <path d="M150 128L188 88M149 150L110 106" stroke-width="1.2"/>
+    </svg>`
+  };
+
+  const words = [
+    {w:'algoritmo', syl:'al·go·rit·mo', cat:'sust. masc.',
+     def:'Conjunto ordenado y finito de instrucciones que permite resolver un problema o realizar una tarea paso a paso.',
+     etym:'del latín medieval <i>algorismus</i>, a partir del nombre del matemático persa al-Juarismi.',
+     ex:'La aplicación usa un <em>algoritmo</em> para recomendarte canciones parecidas a las que ya escuchas.', fig:'Diagrama de flujo'},
+    {w:'artefacto', syl:'ar·te·fac·to', cat:'sust. masc.',
+     def:'Objeto fabricado con cierta técnica para cumplir una función; también, máquina o aparato, sobre todo si es grande o complicado.',
+     etym:'del latín <i>arte factus</i>, «hecho con arte».',
+     ex:'En el museo vimos un <em>artefacto</em> de bronce que servía para medir el paso de las estrellas.', fig:'Engranajes'},
+    {w:'fiable', syl:'fia·ble', cat:'adjetivo',
+     def:'Que merece confianza. Dicho de una persona, una fuente o una máquina que funciona bien y da seguridad.',
+     etym:'derivado de <i>fiar</i>, del latín vulgar <i>fidare</i>.',
+     ex:'Es un coche viejo, pero muy <em>fiable</em>: nunca nos ha dejado tirados en la carretera.', fig:'Escudo de garantía'},
+    {w:'obsoleto', syl:'ob·so·le·to', cat:'adjetivo',
+     def:'Anticuado o caído en desuso, porque ya no responde a las necesidades actuales o ha sido sustituido por algo mejor.',
+     etym:'del latín <i>obsoletus</i>, «gastado, pasado de moda».',
+     ex:'El disquete se quedó <em>obsoleto</em> cuando llegaron las memorias USB.', fig:'Disquete olvidado'},
+    {w:'viable', syl:'via·ble', cat:'adjetivo',
+     def:'Que, por sus circunstancias, tiene probabilidades de llevarse a cabo o de salir adelante.',
+     etym:'del francés <i>viable</i>, derivado de <i>vie</i>, «vida».',
+     ex:'Después de revisar los costes, el equipo concluyó que el proyecto era <em>viable</em>.', fig:'Brote que crece'}
+  ];
+
+  const book = document.getElementById('book');
+  const orn = '<svg class="orn" viewBox="0 0 120 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M0 7h46M74 7h46"/><path d="M60 1l6 6-6 6-6-6z"/><circle cx="50" cy="7" r="1.6" fill="currentColor"/><circle cx="70" cy="7" r="1.6" fill="currentColor"/></svg>';
+
+  // Páginas: índice = 1, palabra k → izquierda 2k, derecha 2k+1
+  const leftPage = (o,i)=>`<div class="inner">
+      <div class="runhead"><span>DICCIONARIO</span><b>${o.w[0].toUpperCase()}</b></div>
+      <div class="entry">
+        <p class="initial" aria-hidden="true">${o.w[0].toUpperCase()}</p>
+        <h2 class="word">${o.w}</h2>
+        <div class="meta"><span class="syl">${o.syl}</span><span class="cat">${o.cat}</span></div>
+        <div class="rule"></div>
+        <p class="def"><span class="n">1.</span>${o.def}</p>
+        <p class="etym">${o.etym}</p>
+      </div></div><span class="folio">${2*i+2}</span>`;
+  const rightPage = (o,i)=>`<div class="inner">
+      <div class="runhead"><span>${o.w.toUpperCase()}</span><b>${i+1} / ${words.length}</b></div>
+      <div class="illus">
+        <div class="plate" role="img" aria-label="Ilustración: ${o.fig}">${art[o.w]}</div>
+        <span class="fig">LÁM. ${['I','II','III','IV','V'][i]} · ${o.fig.toUpperCase()}</span>
+        <div class="example"><span class="lbl">EJEMPLO</span><p>«${o.ex}»</p></div>
+      </div></div><span class="folio">${2*i+3}</span>`;
+  const indexPage = `<div class="inner index">
+      <div class="runhead"><span>DICCIONARIO</span><b>ÍNDICE</b></div>
+      <div class="entry" style="justify-content:flex-start;padding-top:36px;gap:0">
+        <h2>Índice</h2>
+        <p class="sub">Cinco palabras, de la A a la V</p>
+        <ol>${words.map((o,i)=>`<li><button type="button" data-go="${i+2}"><span class="w">${o.w}</span><span class="dots"></span><span class="pg">${2*i+2}</span></button></li>`).join('')}</ol>
+      </div></div><span class="folio">1</span>`;
+
+  // Cada hoja se divide en tiras verticales encadenadas: al girar cada tira un poco más que la anterior, la hoja se curva
+  const K = 10, PW = 460, SW = PW/K;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const leaves = [];
+  function addLeaf(fHTML,fCls,bHTML,bCls){
+    const el=document.createElement('div'); el.className='leaf';
+    const L={el,segs:[],shF:[],shB:[],p:0,dir:1,active:false,raf:0};
+    let parent=el;
+    for(let j=0;j<K;j++){
+      const s=document.createElement('div'); s.className='seg';
+      const fw = SW + (j<K-1 ? 1 : 0);
+      s.style.width=SW+'px'; s.style.left=(j===0?0:SW)+'px';
+      s.innerHTML=
+        `<div class="face front" style="width:${fw}px"><div class="content ${fCls}" style="left:${-j*SW}px">${fHTML}</div><div class="sh"></div></div>`+
+        `<div class="face back" style="width:${fw}px"><div class="content ${bCls}" style="left:${-(PW-(j+1)*SW)}px">${bHTML}</div><div class="sh"></div></div>`;
+      parent.appendChild(s);
+      L.segs.push(s);
+      L.shF.push(s.querySelector(':scope > .front > .sh'));
+      L.shB.push(s.querySelector(':scope > .back > .sh'));
+      parent=s;
+    }
+    book.appendChild(el); leaves.push(L);
+  }
+  function setLeaf(L,p){
+    L.p=p;
+    const th=-180*p, bend = reduced ? 0 : Math.sin(Math.PI*p)*55*L.dir;
+    let prev=0;
+    for(let j=0;j<K;j++){
+      let a = th - bend*Math.pow(j/(K-1),1.5);
+      a=Math.max(-180,Math.min(0,a));
+      L.segs[j].style.transform=`rotateY(${(a-prev).toFixed(2)}deg)`;
+      const curve = Math.abs(a-prev)*(j?1:0)*0.012;
+      L.shF[j].style.opacity=Math.min(.5,(-a/180)*.55 + curve).toFixed(3);
+      L.shB[j].style.opacity=Math.min(.45,((180+a)/180)*.45 + curve).toFixed(3);
+      prev=a;
+    }
+  }
+  addLeaf(`<div class="frame"></div><div class="seal" role="img" aria-label="Logo del IES Palomares"><svg class="logo" viewBox="0 0 1000 1000" aria-hidden="true"><defs><linearGradient id="gf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8843c"/><stop offset=".3" stop-color="#ecd38e"/><stop offset=".48" stop-color="#c8a55a"/><stop offset=".62" stop-color="#f3dea0"/><stop offset=".82" stop-color="#b08a3e"/><stop offset="1" stop-color="#d9bb72"/></linearGradient><path id="arcT" d="M88 500A412 412 0 0 1 912 500"/><path id="arcB" d="M42 500A458 458 0 0 0 958 500"/></defs><g fill="url(#gf)" stroke="url(#gf)"><circle cx="500" cy="500" r="494" fill="none" stroke-width="7"/><circle cx="500" cy="500" r="362" fill="none" stroke-width="5"/><circle cx="70" cy="500" r="11" stroke="none"/><circle cx="930" cy="500" r="11" stroke="none"/><path fill-rule="evenodd" stroke="none" d="M504 751 L472 750 L451 747 L433 742 L421 739 L403 732 L378 719 L349 700 L330 682 L311 659 L296 635 L288 614 L284 604 L279 580 L278 561 L278 305 L278 300 L282 297 L288 296 L714 296 L718 297 L721 299 L722 304 L722 561 L720 578 L715 603 L710 618 L703 633 L688 658 L678 672 L666 685 L642 705 L617 722 L583 737 L564 743 L528 750 L504 751Z M527 674 L526 647 L514 499 L517 495 L635 402 L638 398 L635 396 L524 391 L516 395 L459 444 L451 449 L445 448 L422 438 L390 426 L385 428 L379 433 L360 452 L360 454 L362 456 L384 457 L389 460 L391 466 L392 492 L396 502 L499 608 L501 614 L499 636 L522 671 L525 674 L527 674Z"/><g stroke="none" font-family="Cormorant Garamond,Georgia,serif" font-weight="600" font-size="66" letter-spacing="7"><text text-anchor="middle"><textPath href="#arcT" startOffset="50%">SCIENTIA LAETITIA NOSTRA</textPath></text><text text-anchor="middle" letter-spacing="13"><textPath href="#arcB" startOffset="50%">I.E.S. PALOMARES</textPath></text></g></g></svg></div><h1>Diccionario</h1>${orn}<p>cinco palabras, cinco láminas</p>`,'cover',
+          `<div class="label">Este diccionario pertenece a<br>· · · · · · · · · · · ·<small>MMXXVI</small></div>`,'endpaper');
+  addLeaf(indexPage,'page', leftPage(words[0],0),'page');
+  for(let i=0;i<words.length;i++){
+    if(i<words.length-1) addLeaf(rightPage(words[i],i),'page', leftPage(words[i+1],i+1),'page');
+    else addLeaf(rightPage(words[i],i),'page','','endpaper');
+  }
+  addLeaf('','endpaper',`<div class="frame"></div>${orn}`,'cover backcover');
+
+  const N = leaves.length;
+  let current = 1, zc = 0;
+
+  function zfix(){
+    leaves.forEach((L,i)=>{ if(!L.active) L.el.style.zIndex = i<current ? i+1 : N-i+1; });
+  }
+  function lift(L){ L.active=true; L.el.classList.add('active'); L.el.style.zIndex=1000+(++zc); }
+  function land(L){ L.active=false; L.el.classList.remove('active'); zfix(); }
+  const easeInOut=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const easeOut=t=>1-Math.pow(1-t,3);
+  function animate(L,to,dur,ease,done){
+    cancelAnimationFrame(L.raf);
+    const from=L.p, t0=performance.now();
+    if(reduced) dur=Math.min(dur,120);
+    const step=now=>{
+      const k=Math.min(1,(now-t0)/dur);
+      setLeaf(L, from+(to-from)*ease(k));
+      if(k<1) L.raf=requestAnimationFrame(step); else done&&done();
+    };
+    L.raf=requestAnimationFrame(step);
+  }
+
+  // Sonido de papel sintetizado (sin archivos externos)
+  let actx=null, soundOn=true;
+  function paperSound(soft, landAt){
+    if(!soundOn) return;
+    try{
+      actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+      if(actx.state==='suspended') actx.resume();
+      const t=actx.currentTime, sr=actx.sampleRate, dur=.6, n=Math.floor(sr*dur);
+      const buf=actx.createBuffer(1,n,sr), d=buf.getChannelData(0);
+      let g=0;
+      for(let i=0;i<n;i++){ if(Math.random()<.0035) g=.5+Math.random()*.7; g*=.9992; d[i]=(Math.random()*2-1)*(.3+g); }
+      const src=actx.createBufferSource(); src.buffer=buf;
+      const hp=actx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=350;
+      const bp=actx.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=.7;
+      bp.frequency.setValueAtTime(900,t);
+      bp.frequency.exponentialRampToValueAtTime(3600+Math.random()*900,t+.2);
+      bp.frequency.exponentialRampToValueAtTime(1500,t+dur);
+      const gn=actx.createGain(), v=(soft?.22:.45)*(.85+Math.random()*.3);
+      gn.gain.setValueAtTime(.0001,t);
+      gn.gain.exponentialRampToValueAtTime(v,t+.07);
+      gn.gain.setValueAtTime(v*.8,t+.22);
+      gn.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      src.connect(hp).connect(bp).connect(gn).connect(actx.destination);
+      src.start(t);
+      // golpecito suave al caer la hoja
+      const n2=Math.floor(sr*.14), b2=actx.createBuffer(1,n2,sr), d2=b2.getChannelData(0);
+      for(let i=0;i<n2;i++) d2[i]=(Math.random()*2-1)*Math.pow(1-i/n2,3);
+      const s2=actx.createBufferSource(); s2.buffer=b2;
+      const lp=actx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=650;
+      const g2=actx.createGain(); g2.gain.value=soft?.35:.7;
+      s2.connect(lp).connect(g2).connect(actx.destination);
+      s2.start(t+Math.max(.15,landAt));
+    }catch(e){}
+  }
+
+  function render(){
+    zfix();
+    book.classList.toggle('closed-front', current===0);
+    book.classList.toggle('closed-back', current===N);
+    const open = current>0 && current<N;
+    book.style.setProperty('--ls', (open ? (current-1)*1.5 : 0)+'px');
+    book.style.setProperty('--rs', (open ? (N-1-current)*1.5 : 0)+'px');
+    const st=document.getElementById('status');
+    if(current===0) st.textContent='Portada';
+    else if(current===N) st.textContent='Contraportada';
+    else if(current===1) st.textContent='Índice';
+    else if(current-2 < words.length) st.textContent = words[current-2].w.charAt(0).toUpperCase()+words[current-2].w.slice(1);
+    else st.textContent='Fin';
+    document.getElementById('prev').disabled = current===0;
+    document.getElementById('next').disabled = current===N;
+  }
+  function flip(dir,fast){
+    const idx = dir>0 ? current : current-1;
+    if(idx<0||idx>=N) return false;
+    const L=leaves[idx], dur = fast ? 650 : 1150;
+    current += dir; render();
+    L.dir=dir; lift(L);
+    paperSound(fast, dur/1000*.9);
+    animate(L, dir>0?1:0, dur, easeInOut, ()=>land(L));
+    return true;
+  }
+  let jumping=null;
+  function goTo(target){
+    clearInterval(jumping);
+    if(target===current) return;
+    const dir = target>current ? 1 : -1;
+    flip(dir,true);
+    jumping=setInterval(()=>{ if(current===target || !flip(dir,true)) clearInterval(jumping); }, 150);
+  }
+
+  // Arrastrar la hoja con ratón o dedo
+  let drag=null;
+  book.addEventListener('pointerdown', e=>{
+    if(e.button>0 || e.target.closest('[data-go]')) return;
+    const el=e.target.closest('.leaf'); if(!el) return;
+    const i=leaves.findIndex(L=>L.el===el);
+    const dir = i===current ? 1 : i===current-1 ? -1 : 0;
+    if(!dir || leaves[i].active) return;
+    clearInterval(jumping);
+    const L=leaves[i];
+    drag={L,dir,x0:e.clientX,y0:e.clientY,moved:false,w:book.getBoundingClientRect().width};
+    L.dir=dir; lift(L);
+    try{ book.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  book.addEventListener('pointermove', e=>{
+    if(!drag) return;
+    const dx=e.clientX-drag.x0;
+    if(!drag.moved && Math.abs(dx)>6) drag.moved=true;
+    if(!drag.moved) return;
+    const span=drag.w*.85;
+    const p = drag.dir>0 ? -dx/span : 1-dx/span;
+    setLeaf(drag.L, Math.max(0,Math.min(1,p)));
+  });
+  function endDrag(cancel){
+    if(!drag) return;
+    const {L,dir,moved}=drag; drag=null;
+    if(!moved && !cancel){
+      // clic sin arrastrar: pasar la hoja completa
+      current+=dir; render();
+      paperSound(false,1.05);
+      animate(L, dir>0?1:0, 1150, easeInOut, ()=>land(L));
+      return;
+    }
+    const prog = dir>0 ? L.p : 1-L.p;
+    if(!cancel && prog>.22){
+      const dur=250+600*(1-prog);
+      current+=dir; render();
+      paperSound(prog>.6, dur/1000*.9);
+      animate(L, dir>0?1:0, dur, easeOut, ()=>land(L));
+    } else {
+      animate(L, dir>0?0:1, 320, easeOut, ()=>land(L));
+    }
+  }
+  book.addEventListener('pointerup', ()=>endDrag(false));
+  book.addEventListener('pointercancel', ()=>endDrag(true));
+
+  book.addEventListener('click', e=>{
+    const go=e.target.closest('[data-go]');
+    if(go){ e.stopPropagation(); goTo(+go.dataset.go); }
+  });
+  document.getElementById('next').addEventListener('click',()=>flip(1));
+  document.getElementById('prev').addEventListener('click',()=>flip(-1));
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight') flip(1);
+    if(e.key==='ArrowLeft') flip(-1);
+  });
+  const sndBtn=document.getElementById('snd');
+  sndBtn.addEventListener('click',()=>{
+    soundOn=!soundOn;
+    sndBtn.setAttribute('aria-pressed',soundOn);
+    document.getElementById('wave').style.display=soundOn?'':'none';
+    document.getElementById('sndtxt').textContent=soundOn?'Sonido':'Silencio';
+  });
+  leaves.forEach((L,i)=>setLeaf(L, i<current?1:0));
+
+  const stage=document.getElementById('stage'), scaler=document.getElementById('scaler');
+  function fit(){
+    const W=920+48, H=620+70;
+    const s=Math.max(.3,Math.min(1, stage.clientWidth/W, (window.innerHeight-150)/H));
+    scaler.style.transform=`translateX(-50%) translateY(${12*s}px) scale(${s})`;
+    stage.style.height=(H*s)+'px';
+  }
+  window.addEventListener('resize',fit);
+  fit(); render();
+})();
+</script>
+
+</body>
+</html>
