@@ -6,8 +6,6 @@ Autor: David Rayo Torres · IES Palomares
 
 **Abrir la aplicación:** https://davidrayo-tecno.github.io/Arduino/
 
-**Pequeño diccionario ilustrado:** https://davidrayo-tecno.github.io/Arduino/diccionario/
-
 > Versión de prueba: **Fase 1**.
 
 ## Qué incluye la Fase 1
