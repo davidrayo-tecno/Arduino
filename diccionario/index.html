@@ -150,6 +150,9 @@ body.single .hint{font-size:11px}
 .def{font-family:var(--font-serif);font-size:23px;line-height:1.4;margin:0;max-width:30ch}
 .def .n{font-weight:600;color:var(--gold-ink);margin-right:6px}
 .etym{font-family:var(--font-serif);font-style:italic;font-size:17px;color:var(--page-muted);margin:6px 0 0;line-height:1.4}
+.rae{align-self:flex-start;display:inline-flex;gap:6px;align-items:center;margin-top:4px;padding:6px 12px;border:1px solid #d6c79f;border-radius:999px;font-family:var(--font-ui);font-size:12px;letter-spacing:.03em;color:var(--gold-ink);text-decoration:none;background:rgba(255,255,255,.5)}
+.rae:hover,.rae:focus-visible{border-color:var(--gold-ink);outline:none;background:#fff}
+body.single .rae{font-size:14px;padding:8px 14px}
 .etym::before{content:"Etim. ";font-style:normal;font-family:var(--font-display);letter-spacing:.12em;font-size:13px;color:var(--gold-ink)}
 
 .illus{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
@@ -495,6 +498,7 @@ body.single .hint{font-size:11px}
         <div class="rule"></div>
         <p class="def"><span class="n">1.</span>${o.def}</p>
         <p class="etym">${o.etym}</p>
+        <a class="rae" href="https://dle.rae.es/${encodeURIComponent(o.w)}" target="_blank" rel="noopener">Definición en el diccionario de la RAE <span aria-hidden="true">↗</span></a>
       </div></div><span class="folio">${2*i+2}</span>`;
   const rightPage = (o,i)=>`<div class="inner">
       <div class="runhead"><span>${o.w.toUpperCase()}</span><b>${i+1} / ${words.length}</b></div>
@@ -689,7 +693,7 @@ body.single .hint{font-size:11px}
   // Arrastrar o tocar: arrastrar a la izquierda avanza, a la derecha retrocede
   let drag=null;
   book.addEventListener('pointerdown', e=>{
-    if(e.button>0 || e.target.closest('[data-go]')) return;
+    if(e.button>0 || e.target.closest('[data-go],a')) return;
     clearInterval(jumping);
     drag={x0:e.clientX,y0:e.clientY,decided:false,L:null,dir:0,w:book.getBoundingClientRect().width};
     try{ book.setPointerCapture(e.pointerId); }catch(_){}
