@@ -148,9 +148,6 @@ body.single .hint{font-size:11px}
 .rule{width:56px;height:1px;background:var(--gold);margin:4px 0}
 .def{font-family:var(--font-serif);font-size:23px;line-height:1.4;margin:0;max-width:30ch}
 .def .n{font-weight:600;color:var(--gold-ink);margin-right:6px}
-.rae{align-self:flex-start;display:inline-flex;gap:6px;align-items:center;margin-top:4px;padding:6px 12px;border:1px solid #d6c79f;border-radius:999px;font-family:var(--font-ui);font-size:12px;letter-spacing:.03em;color:var(--gold-ink);text-decoration:none;background:rgba(255,255,255,.5)}
-.rae:hover,.rae:focus-visible{border-color:var(--gold-ink);outline:none;background:#fff}
-body.single .rae{font-size:14px;padding:8px 14px}
 
 .illus{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
 .plate{
@@ -478,7 +475,6 @@ body.single .rae{font-size:14px;padding:8px 14px}
         <div class="meta"><span class="cat">${o.cat}</span></div>
         <div class="rule"></div>
         <p class="def">${o.def}</p>
-        <a class="rae" href="https://dle.rae.es/${encodeURIComponent(o.w)}" target="_blank" rel="noopener">Definición en el diccionario de la RAE <span aria-hidden="true">↗</span></a>
       </div></div><span class="folio">${2*i+2}</span>`;
   const rightPage = (o,i)=>`<div class="inner">
       <div class="runhead"><span>${o.w.toUpperCase()}</span><b>${i+1} / ${words.length}</b></div>
