@@ -46,16 +46,35 @@ body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
   overflow-x:hidden;
 }
-.stage{width:100%;max-width:1040px;position:relative}
+html{overflow-x:clip}
+.stage{width:100%;max-width:1040px;position:relative;overflow-x:clip}
 .scaler{transition:transform .55s cubic-bezier(.4,0,.2,1)}
 body.single .stage{clip-path:inset(-60px 0 -90px 0)}
+body.single .front .inner{inset:36px 30px 52px 40px}
+body.single .back .inner{inset:36px 40px 52px 30px}
+body.single .entry{gap:18px}
+body.single .initial{font-size:130px}
+body.single .word{font-size:54px}
+body.single .meta{font-size:21px}
+body.single .def{font-size:26px;line-height:1.42}
+body.single .etym{font-size:19px}
+body.single .runhead{font-size:13px}
+body.single .illus{gap:28px}
+body.single .plate{max-width:100%}
+body.single .example p{font-size:25px}
+body.single .index h2{font-size:46px}
+body.single .index button{font-size:27px;padding:12px 4px}
+body.single .cover h1{font-size:48px}
+body.single .cover .logo{width:200px;height:200px}
+body.single .cover p{font-size:22px}
 body.single{padding-block:12px;gap:14px}
 body.single .controls{gap:10px}
 body.single .controls button{padding:9px 14px}
 body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
 .scaler{position:absolute;left:50%;top:0;transform-origin:top center}
 
-.book{position:relative;width:920px;height:620px;perspective:2600px}
+:root{--pw:460px;--ph:620px}
+.book{position:relative;width:calc(var(--pw)*2);height:var(--ph);perspective:2600px}
 .shadow{
   position:absolute;left:4%;right:4%;bottom:-34px;height:50px;
   background:radial-gradient(closest-side,rgba(0,0,0,.35),transparent);
@@ -76,11 +95,11 @@ body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
   background:repeating-linear-gradient(90deg,var(--paper) 0 1px,var(--paper-edge) 1px 2px);
   transition:width .9s;
 }
-.stack.left{right:50%;margin-right:460px;width:var(--ls,0px);border-radius:2px 0 0 2px}
-.stack.right{left:50%;margin-left:460px;width:var(--rs,0px);border-radius:0 2px 2px 0}
+.stack.left{right:50%;margin-right:var(--pw);width:var(--ls,0px);border-radius:2px 0 0 2px}
+.stack.right{left:50%;margin-left:var(--pw);width:var(--rs,0px);border-radius:0 2px 2px 0}
 
 .book{touch-action:pan-y;user-select:none;-webkit-user-select:none}
-.leaf{position:absolute;top:0;left:50%;width:460px;height:620px;transform-style:preserve-3d;cursor:grab}
+.leaf{position:absolute;top:0;left:50%;width:var(--pw);height:var(--ph);transform-style:preserve-3d;cursor:grab}
 .leaf.active{cursor:grabbing}
 .seg{position:absolute;top:0;height:100%;transform-origin:left center;transform-style:preserve-3d;will-change:transform}
 .face{
@@ -88,7 +107,7 @@ body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
   backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;
 }
 .face.back{transform:rotateY(180deg)}
-.content{position:absolute;top:0;width:460px;height:620px;background:var(--paper);color:var(--page-ink)}
+.content{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--paper);color:var(--page-ink)}
 .sh{position:absolute;inset:0;background:#1a1408;opacity:0;pointer-events:none}
 .page{
   background-color:var(--paper);
@@ -356,7 +375,7 @@ body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
       </div></div><span class="folio">1</span>`;
 
   // Cada hoja se divide en tiras verticales encadenadas: al girar cada tira un poco más que la anterior, la hoja se curva
-  const K = 10, PW = 460, SW = PW/K;
+  const K = 10; let PW = 460, PH = 620, SW = PW/K;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const leaves = [];
   function addLeaf(fHTML,fCls,bHTML,bCls){
@@ -371,12 +390,25 @@ body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
         `<div class="face front" style="width:${fw}px"><div class="content ${fCls}" style="left:${-j*SW}px">${fHTML}</div><div class="sh"></div></div>`+
         `<div class="face back" style="width:${fw}px"><div class="content ${bCls}" style="left:${-(PW-(j+1)*SW)}px">${bHTML}</div><div class="sh"></div></div>`;
       parent.appendChild(s);
+      s._j=j; s._fc=s.querySelector(':scope > .front > .content'); s._bc=s.querySelector(':scope > .back > .content');
       L.segs.push(s);
       L.shF.push(s.querySelector(':scope > .front > .sh'));
       L.shB.push(s.querySelector(':scope > .back > .sh'));
       parent=s;
     }
     book.appendChild(el); leaves.push(L);
+  }
+  function relayout(pw,ph){
+    if(pw===PW && ph===PH) return;
+    PW=pw; PH=ph; SW=PW/K;
+    document.documentElement.style.setProperty('--pw',PW+'px');
+    document.documentElement.style.setProperty('--ph',PH+'px');
+    leaves.forEach(L=>L.segs.forEach(s=>{
+      const j=s._j, fw=SW+(j<K-1?1:0);
+      s.style.width=SW+'px'; s.style.left=(j===0?0:SW)+'px';
+      s.children[0].style.width=fw+'px'; s.children[1].style.width=fw+'px';
+      s._fc.style.left=(-j*SW)+'px'; s._bc.style.left=(-(PW-(j+1)*SW))+'px';
+    }));
   }
   function setLeaf(L,p){
     L.p=p;
@@ -594,19 +626,30 @@ body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
     if(single){
       if(current===0) side='R';
       if(current===N) side='L';
-      off = side==='L' ? 230 : -230;
+      off = side==='L' ? PW/2 : -PW/2;
     }
     scaler.style.transform=`translateX(-50%) translateY(${12*scale}px) scale(${scale}) translateX(${off}px)`;
   }
   function fit(){
-    const H=620+70, avail=window.innerHeight-170;
-    const two=Math.min(1, stage.clientWidth/(920+48), avail/H);
-    const one=Math.min(1.15, stage.clientWidth/(460+28), Math.max(avail,420)/H);
+    const vw=stage.clientWidth, vh=window.innerHeight;
     const wasSingle=single;
-    single = one > two*1.35;           // pantallas estrechas: una página
-    if(single && !wasSingle) side = current===0 ? 'R' : (current===N ? 'L' : 'R');
-    scale = single ? one : Math.max(.3,two);
+    single = vw < 720;                 // pantallas estrechas: una página
     document.body.classList.toggle('single', single);
+    let H;
+    if(single){
+      const ctr=document.querySelector('.controls').offsetHeight + document.getElementById('hint').offsetHeight;
+      const avail = vh - ctr - 14*2 - 24;
+      const pw = 380;
+      scale = Math.min(1.25, vw/(pw+20));
+      const ph = Math.round(Math.max(560, Math.min(1100, avail/scale - 46)));
+      relayout(pw, ph);
+      H = PH + 46;
+      if(!wasSingle) side = current===N ? 'L' : 'R';
+    } else {
+      relayout(460, 620);
+      H = PH + 70;
+      scale = Math.max(.3, Math.min(1, vw/(920+48), (vh-170)/H));
+    }
     stage.style.height=(H*scale)+'px';
     document.getElementById('hint').textContent = single
       ? 'Toca el borde derecho o izquierdo, o desliza el dedo para pasar página'
@@ -614,7 +657,7 @@ body.single .status{min-width:0;width:100%;order:-1;font-size:18px}
     render();
   }
   window.addEventListener('resize',fit);
-  fit();
+  fit(); fit();
 })();
 </script>
 
