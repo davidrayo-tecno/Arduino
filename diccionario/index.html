@@ -57,7 +57,6 @@ body.single .initial{font-size:130px}
 body.single .word{font-size:54px}
 body.single .meta{font-size:21px}
 body.single .def{font-size:26px;line-height:1.42}
-body.single .etym{font-size:19px}
 body.single .runhead{font-size:13px}
 body.single .illus{gap:28px}
 body.single .plate{max-width:100%}
@@ -149,11 +148,9 @@ body.single .hint{font-size:11px}
 .rule{width:56px;height:1px;background:var(--gold);margin:4px 0}
 .def{font-family:var(--font-serif);font-size:23px;line-height:1.4;margin:0;max-width:30ch}
 .def .n{font-weight:600;color:var(--gold-ink);margin-right:6px}
-.etym{font-family:var(--font-serif);font-style:italic;font-size:17px;color:var(--page-muted);margin:6px 0 0;line-height:1.4}
 .rae{align-self:flex-start;display:inline-flex;gap:6px;align-items:center;margin-top:4px;padding:6px 12px;border:1px solid #d6c79f;border-radius:999px;font-family:var(--font-ui);font-size:12px;letter-spacing:.03em;color:var(--gold-ink);text-decoration:none;background:rgba(255,255,255,.5)}
 .rae:hover,.rae:focus-visible{border-color:var(--gold-ink);outline:none;background:#fff}
 body.single .rae{font-size:14px;padding:8px 14px}
-.etym::before{content:"Etim. ";font-style:normal;font-family:var(--font-display);letter-spacing:.12em;font-size:13px;color:var(--gold-ink)}
 
 .illus{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
 .plate{
@@ -408,79 +405,63 @@ body.single .rae{font-size:14px;padding:8px 14px}
       <circle cx="170" cy="112" r="32" stroke="${A}" stroke-width="1" stroke-opacity=".3"/>
       <g transform="translate(172 106) rotate(38)"><rect x="-11" y="-96" width="22" height="98" rx="11" fill="${P}"/><rect x="-6.5" y="-20" width="13" height="13" rx="4" stroke-width="1.2"/></g>
     </svg>`,
-    tolerancia: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" font-family="Jost,sans-serif" text-anchor="middle">
-      <defs><marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${G}" stroke="none"/></marker></defs>
-      <rect x="56" y="98" width="184" height="54" fill="${A}" fill-opacity=".22"/>
-      <ellipse cx="240" cy="125" rx="9" ry="27" fill="${P}"/>
-      <ellipse cx="56" cy="125" rx="9" ry="27" fill="${A}" fill-opacity=".22"/>
-      <path d="M30 125H275" stroke-width="1" stroke-dasharray="12 4 2 4"/>
-      <path d="M150 101V149" stroke-width="1.3" marker-start="url(#ad)" marker-end="url(#ad)"/>
-      <text x="150" y="80" font-size="20" fill="${G}" stroke="none">Ø 20 ± 0,1</text>
-      <rect x="84" y="182" width="132" height="30" rx="4" fill="${P}" stroke="${A}" stroke-width="1.2"/>
-      <text x="150" y="202" font-size="13" fill="${G}" stroke="none">19,9 ≤ Ø ≤ 20,1 mm</text>
+    tolerancia: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M92 150L78 186L122 154" fill="${P}"/>
+      <ellipse cx="110" cy="108" rx="74" ry="52" fill="${P}"/>
+      <path d="M92 150L78 186L122 154" fill="${P}" stroke="none"/>
+      <path d="M74 98H146M84 120H136" stroke="${A}" stroke-width="3"/>
+      <path d="M228 160L240 196L206 160" fill="${A}" fill-opacity=".25"/>
+      <rect x="152" y="78" width="122" height="84" rx="14" fill="#f0e6cf"/>
+      <path d="M228 158L240 196L206 158" fill="#f0e6cf" stroke="none"/>
+      <path d="M172 106H252M172 128H228" stroke="${G}" stroke-width="3" stroke-opacity=".7"/>
     </svg>`
   };
 
   const words = [
     {w:'algoritmo', cat:'sust. masc.',
-     def:'Conjunto ordenado y finito de instrucciones que permite resolver un problema o realizar una tarea paso a paso.',
-     etym:'del latín medieval <i>algorismus</i>, a partir del nombre del matemático persa al-Juarismi.',
+     def:'Conjunto ordenado de pasos que permite resolver un problema o realizar una tarea.',
      ex:'La aplicación usa un <em>algoritmo</em> para recomendarte canciones parecidas a las que ya escuchas.', fig:'Diagrama de flujo'},
     {w:'artefacto', cat:'sust. masc.',
-     def:'Objeto fabricado con cierta técnica para cumplir una función; también, máquina o aparato, sobre todo si es grande o complicado.',
-     etym:'del latín <i>arte factus</i>, «hecho con arte».',
+     def:'Objeto fabricado por las personas para un fin determinado. También, máquina o aparato, sobre todo si es grande o complicado.',
      ex:'En el museo vimos un <em>artefacto</em> de bronce que servía para medir el paso de las estrellas.', fig:'Engranajes'},
     {w:'dato', cat:'sust. masc.',
-     def:'Información concreta, como un número, una medida o una palabra, que sirve para conocer algo o para que un programa la procese.',
-     etym:'del latín <i>datum</i>, «lo dado».',
+     def:'Información concreta que permite conocer algo o llegar a una conclusión.',
      ex:'El sensor de temperatura envía un <em>dato</em> nuevo a la placa Arduino cada segundo.', fig:'Tabla de valores'},
     {w:'diseño', cat:'sust. masc.',
-     def:'Proceso de idear y planificar un objeto antes de fabricarlo, decidiendo su forma, su función y sus materiales. También, el resultado de ese proceso.',
-     etym:'del italiano <i>disegno</i>, «dibujo».',
+     def:'Plan o dibujo con el que se idea un objeto antes de fabricarlo. También, la forma y el aspecto que tiene ese objeto.',
      ex:'Antes de cortar la madera, hicimos el <em>diseño</em> de la estructura en papel y a escala.', fig:'Plano acotado'},
     {w:'error', cat:'sust. masc.',
-     def:'Acción, idea o resultado equivocado. En técnica, diferencia entre el valor medido o calculado y el valor real.',
-     etym:'del latín <i>error</i>, derivado de <i>errare</i>, «vagar, equivocarse».',
+     def:'Idea, acción o juicio equivocado.',
      ex:'El programa no compilaba por un <em>error</em>: faltaba un punto y coma.', fig:'Código con fallo'},
     {w:'fiable', cat:'adjetivo',
-     def:'Que merece confianza. Dicho de una persona, una fuente o una máquina que funciona bien y da seguridad.',
-     etym:'derivado de <i>fiar</i>, del latín vulgar <i>fidare</i>.',
+     def:'Que merece confianza o funciona con seguridad.',
      ex:'Es un coche viejo, pero muy <em>fiable</em>: nunca nos ha dejado tirados en la carretera.', fig:'Escudo de garantía'},
     {w:'ingenio', cat:'sust. masc.',
-     def:'Capacidad para inventar, resolver problemas y encontrar soluciones nuevas con rapidez y creatividad.',
-     etym:'del latín <i>ingenium</i>, «talento natural».',
+     def:'Capacidad para inventar cosas o encontrar soluciones con facilidad y creatividad.',
      ex:'Con mucho <em>ingenio</em>, construyeron un puente resistente usando solo palillos y cola.', fig:'Bombilla y engranaje'},
     {w:'obsoleto', cat:'adjetivo',
-     def:'Anticuado o caído en desuso, porque ya no responde a las necesidades actuales o ha sido sustituido por algo mejor.',
-     etym:'del latín <i>obsoletus</i>, «gastado, pasado de moda».',
+     def:'Anticuado o que ha dejado de usarse porque ya no sirve o ha sido sustituido por algo mejor.',
      ex:'El disquete se quedó <em>obsoleto</em> cuando llegaron las memorias USB.', fig:'Disquete olvidado'},
     {w:'precisión', cat:'sust. fem.',
-     def:'Exactitud con que se hace, se mide o se expresa algo. En una medición, grado en que los resultados repetidos coinciden entre sí.',
-     etym:'del latín <i>praecisio</i>, «corte», derivado de <i>praecidere</i>, «cortar».',
+     def:'Exactitud y cuidado con que se hace, se mide o se dice algo.',
      ex:'Para medir la pieza con <em>precisión</em> usamos el calibre en lugar de la regla.', fig:'Diana'},
     {w:'proyecto', cat:'sust. masc.',
-     def:'Plan detallado para realizar algo, con sus objetivos, pasos, materiales y plazos. En Tecnología, proceso que va de un problema a un objeto construido.',
-     etym:'del latín <i>proiectus</i>, «lanzado hacia delante».',
+     def:'Plan que se prepara para hacer algo, con los pasos y los medios necesarios para conseguirlo.',
      ex:'Este trimestre nuestro <em>proyecto</em> es un semáforo que funciona con Arduino.', fig:'Fases del proyecto'},
     {w:'resiliencia', cat:'sust. fem.',
-     def:'Capacidad de una persona, un material o un sistema para soportar una situación adversa y recuperarse de ella.',
-     etym:'del inglés <i>resilience</i>, y este del latín <i>resilire</i>, «saltar hacia atrás, rebotar».',
+     def:'Capacidad para superar una situación difícil y recuperarse de ella.',
      ex:'La <em>resiliencia</em> del equipo se notó cuando, tras fallar el prototipo, lo rediseñaron en una semana.', fig:'Muelle que recupera'},
     {w:'sostenible', cat:'adjetivo',
      def:'Que puede mantenerse en el tiempo sin agotar los recursos ni dañar el medio ambiente.',
-     etym:'derivado de <i>sostener</i>, del latín <i>sustinere</i>.',
      ex:'Construimos la maqueta con cartón reciclado para que fuera más <em>sostenible</em>.', fig:'Ciclo y hoja'},
     {w:'tangible', cat:'adjetivo',
-     def:'Que se puede tocar. También, que se percibe de forma clara y concreta.',
-     etym:'del latín tardío <i>tangibilis</i>, derivado de <i>tangere</i>, «tocar».',
+     def:'Que se puede tocar o percibir con claridad.',
      ex:'Al terminar, el esfuerzo se convirtió en algo <em>tangible</em>: un robot que funcionaba.', fig:'Objeto al tacto'},
     {w:'tolerancia', cat:'sust. fem.',
-     def:'Margen de variación que se admite en una medida sin que la pieza deje de ser válida. También, respeto hacia las ideas de los demás.',
-     etym:'del latín <i>tolerantia</i>, derivado de <i>tolerare</i>, «soportar».',
-     ex:'El plano indica una <em>tolerancia</em> de ±0,1 mm en el diámetro del eje.', fig:'Eje acotado'},
+     def:'Respeto hacia las ideas, opiniones o costumbres de los demás, aunque no coincidan con las propias.',
+     ex:'En el debate practicamos la <em>tolerancia</em> escuchando opiniones distintas a la nuestra.', fig:'Dos opiniones'},
     {w:'viable', cat:'adjetivo',
-     def:'Que, por sus circunstancias, tiene probabilidades de llevarse a cabo o de salir adelante.',
-     etym:'del francés <i>viable</i>, derivado de <i>vie</i>, «vida».',
+     def:'Que tiene probabilidades de llevarse a cabo o de salir adelante.',
      ex:'Después de revisar los costes, el equipo concluyó que el proyecto era <em>viable</em>.', fig:'Brote que crece'}
   ];
   const roman = n => [['X',10],['IX',9],['V',5],['IV',4],['I',1]].reduce((s,[r,v])=>{while(n>=v){s+=r;n-=v;}return s;},'');
@@ -496,8 +477,7 @@ body.single .rae{font-size:14px;padding:8px 14px}
         <h2 class="word">${o.w}</h2>
         <div class="meta"><span class="cat">${o.cat}</span></div>
         <div class="rule"></div>
-        <p class="def"><span class="n">1.</span>${o.def}</p>
-        <p class="etym">${o.etym}</p>
+        <p class="def">${o.def}</p>
         <a class="rae" href="https://dle.rae.es/${encodeURIComponent(o.w)}" target="_blank" rel="noopener">Definición en el diccionario de la RAE <span aria-hidden="true">↗</span></a>
       </div></div><span class="folio">${2*i+2}</span>`;
   const rightPage = (o,i)=>`<div class="inner">
