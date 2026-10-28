@@ -63,7 +63,8 @@ body.single .illus{gap:28px}
 body.single .plate{max-width:100%}
 body.single .example p{font-size:25px}
 body.single .index h2{font-size:46px}
-body.single .index button{font-size:27px;padding:12px 4px}
+body.single .index ol{grid-auto-flow:row;grid-template-rows:none;grid-template-columns:1fr}
+body.single .index button{font-size:23px;padding:5px 4px}
 body.single .cover h1{font-size:48px}
 body.single .cover .logo{width:200px;height:200px}
 body.single .cover p{font-size:22px}
@@ -168,11 +169,11 @@ body.single .hint{font-size:11px}
 /* índice */
 .index h2{font-family:var(--font-display);font-size:40px;margin:0 0 6px;font-weight:700}
 .index .sub{font-family:var(--font-serif);font-style:italic;color:var(--page-muted);font-size:18px;margin:0 0 22px}
-.index ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.index ol{list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-template-rows:repeat(8,auto);grid-template-columns:1fr 1fr;column-gap:26px}
 .index button{
   all:unset;box-sizing:border-box;width:100%;cursor:pointer;
-  display:flex;align-items:baseline;gap:10px;padding:8px 4px;
-  font-family:var(--font-serif);font-size:24px;color:var(--page-ink);
+  display:flex;align-items:baseline;gap:8px;padding:5px 2px;
+  font-family:var(--font-serif);font-size:20px;color:var(--page-ink);
 }
 .index button .dots{flex:1;border-bottom:1.5px dotted #c6bca6;transform:translateY(-6px)}
 .index button .pg{font-variant-numeric:tabular-nums oldstyle-nums;color:var(--page-muted);font-size:20px}
@@ -322,31 +323,164 @@ body.single .hint{font-size:11px}
       <path d="M149 150C118 146 98 124 102 98C130 98 148 120 149 150Z" fill="${G}" fill-opacity=".85"/>
       <path d="M150 128C176 126 198 104 200 78C172 78 152 100 150 128Z" fill="${P}"/>
       <path d="M150 128L188 88M149 150L110 106" stroke-width="1.2"/>
+    </svg>`,
+    dato: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" font-family="Jost,sans-serif" text-anchor="middle">
+      ${['12','0,8','104','37','23,5','9','256','1','64'].map((v,k)=>{const c=k%3,r=Math.floor(k/3),x=45+c*70,y=35+r*60,hi=k===4;
+        return `<rect x="${x}" y="${y}" width="70" height="60" fill="${hi?A:P}" fill-opacity="${hi?.3:1}" stroke-width="${hi?3:1.5}"/>`+
+               `<text x="${x+35}" y="${y+37}" font-size="${hi?22:18}" font-weight="${hi?600:400}" fill="${hi?G:'#8a8172'}" stroke="none">${v}</text>`}).join('')}
+      <path d="M150 215V232" stroke="${A}"/><text x="150" y="247" font-size="12" fill="${A}" stroke="none" letter-spacing="2">UN DATO</text>
+    </svg>`,
+    'diseño': `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" font-family="Jost,sans-serif" text-anchor="middle">
+      <defs><marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${G}" stroke="none"/></marker></defs>
+      <rect x="28" y="22" width="244" height="206" fill="${P}"/>
+      <path d="M28 52H272M28 82H272M28 112H272M28 142H272M28 172H272M28 202H272M58 22V228M88 22V228M118 22V228M148 22V228M178 22V228M208 22V228M238 22V228" stroke="${A}" stroke-opacity=".25" stroke-width="1"/>
+      <path d="M70 76H190V116H122V190H70Z" fill="${A}" fill-opacity=".22" stroke-width="2.4"/>
+      <path d="M70 66V50M190 66V50" stroke-width="1"/><path d="M71 56H189" stroke-width="1.2" marker-start="url(#ad)" marker-end="url(#ad)"/>
+      <text x="130" y="47" font-size="13" fill="${G}" stroke="none">120</text>
+      <path d="M60 76H44M60 190H44" stroke-width="1"/><path d="M50 77V189" stroke-width="1.2" marker-start="url(#ad)" marker-end="url(#ad)"/>
+      <text x="40" y="137" font-size="13" fill="${G}" stroke="none" transform="rotate(-90 40 133)">114</text>
+      <g transform="translate(232 176) rotate(-45)"><rect x="-6" y="-7" width="76" height="14" fill="${A}" fill-opacity=".55"/><path d="M-6 -7L-22 0L-6 7Z" fill="${P}"/><path d="M-17 -2L-22 0L-17 2Z" fill="${G}"/></g>
+    </svg>`,
+    error: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" stroke-linecap="round">
+      <rect x="30" y="32" width="240" height="182" rx="6" fill="${P}"/>
+      <path d="M30 56H270" stroke-width="1.5"/>
+      <circle cx="46" cy="44" r="4" fill="${A}" stroke="none"/><circle cx="60" cy="44" r="4" fill="${A}" fill-opacity=".6" stroke="none"/><circle cx="74" cy="44" r="4" fill="${A}" fill-opacity=".35" stroke="none"/>
+      <path d="M50 80H150M50 100H120M66 120H200M66 140H170M50 160H96M50 180H140" stroke="${A}" stroke-width="5" stroke-opacity=".55"/>
+      <path d="M66 140H170" stroke="${G}" stroke-width="5"/>
+      <path d="M66 151q5 -6 10 0t10 0t10 0t10 0t10 0t10 0t10 0t10 0t10 0t10 0t10 0" stroke="${G}" stroke-width="1.6"/>
+      <circle cx="226" cy="140" r="17" fill="${G}" stroke="none"/><path d="M219 133L233 147M233 133L219 147" stroke="${P}" stroke-width="3"/>
+    </svg>`,
+    ingenio: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+      ${[0,1,2,3,4,5,6].map(i=>{const a=Math.PI*(1.05+i*0.15);return `<path stroke="${A}" d="M${(150+Math.cos(a)*92).toFixed(1)} ${(100+Math.sin(a)*92).toFixed(1)}L${(150+Math.cos(a)*110).toFixed(1)} ${(100+Math.sin(a)*110).toFixed(1)}"/>`}).join('')}
+      <path d="M150 34C108 34 86 66 92 99C96 121 111 132 118 148V170H182V148C189 132 204 121 208 99C214 66 192 34 150 34Z" fill="${A}" fill-opacity=".18"/>
+      <path d="${gear(150,98,22,8,7)}" fill="${P}" stroke-width="1.8"/><circle cx="150" cy="98" r="7" fill="${G}" stroke="none"/>
+      <path d="M150 128V170" stroke-width="1.4"/>
+      <rect x="120" y="172" width="60" height="11" rx="3" fill="${P}"/><rect x="124" y="186" width="52" height="11" rx="3" fill="${P}"/>
+      <path d="M134 202H166" stroke-width="3"/>
+    </svg>`,
+    'precisión': `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2">
+      <path d="M150 18V222M48 120H252" stroke-width="1" stroke-dasharray="3 5"/>
+      <circle cx="150" cy="120" r="92" fill="${A}" fill-opacity=".1"/>
+      <circle cx="150" cy="120" r="66" fill="${P}"/>
+      <circle cx="150" cy="120" r="40" fill="${A}" fill-opacity=".22"/>
+      <circle cx="150" cy="120" r="16" fill="${A}" fill-opacity=".5"/>
+      <circle cx="147" cy="117" r="4.5" fill="${G}" stroke="none"/><circle cx="155" cy="122" r="4.5" fill="${G}" stroke="none"/>
+      <circle cx="149" cy="126" r="4.5" fill="${G}" stroke="none"/><circle cx="156" cy="114" r="4.5" fill="${G}" stroke="none"/>
+    </svg>`,
+    proyecto: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" font-family="Jost,sans-serif" text-anchor="middle">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${G}" stroke="none"/></marker></defs>
+      <path d="M250 96C250 40 50 40 50 96" stroke-dasharray="4 5" stroke-width="1.4" marker-end="url(#ar)"/>
+      <text x="150" y="40" font-size="11" fill="${A}" stroke="none" letter-spacing="1.5">MEJORAR</text>
+      <path d="M73 125H92M140 125H159M206 125H225" stroke="${A}" marker-end="url(#ar)"/>
+      ${['Idea','Diseño','Construir','Probar'].map((t,k)=>{const x=50+k*66.7,last=k===3;
+        return `<circle cx="${x}" cy="125" r="22" fill="${last?G:P}"/>`+
+          (last?`<path d="M${x-9} 125l6 7l13 -14" stroke="${P}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`
+               :`<text x="${x}" y="132" font-size="19" fill="${G}" stroke="none">${k+1}</text>`)+
+          `<text x="${x}" y="172" font-size="13" fill="${G}" stroke="none">${t}</text>`}).join('')}
+      <path d="M40 205H260" stroke="${A}" stroke-dasharray="2 6"/>
+    </svg>`,
+    resiliencia: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${A}" stroke="none"/></marker></defs>
+      <path d="M40 222H260" stroke="${A}"/>
+      <rect x="108" y="210" width="84" height="10" rx="2" fill="${G}" stroke="none"/>
+      <path d="M150 210V200L120 192L180 178L120 164L180 150L120 136L180 122L150 114V106" stroke-width="2.6"/>
+      <rect x="104" y="64" width="92" height="42" rx="4" fill="${A}" fill-opacity=".3"/>
+      <path d="M78 176C58 146 58 112 82 84" stroke="${A}" marker-end="url(#ar)"/>
+      <path d="M222 176C242 146 242 112 218 84" stroke="${A}" marker-end="url(#ar)"/>
+      <path d="M128 50L150 30L172 50" stroke="${A}" stroke-width="1.6"/>
+    </svg>`,
+    sostenible: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <defs><marker id="as" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="${A}" stroke="none"/></marker></defs>
+      ${[0,1,2].map(k=>{const a0=(-80+k*120)*Math.PI/180,a1=a0+95*Math.PI/180,r=88;
+        return `<path stroke="${A}" stroke-width="7" marker-end="url(#as)" d="M${(150+Math.cos(a0)*r).toFixed(1)} ${(122+Math.sin(a0)*r).toFixed(1)}A${r} ${r} 0 0 1 ${(150+Math.cos(a1)*r).toFixed(1)} ${(122+Math.sin(a1)*r).toFixed(1)}"/>`}).join('')}
+      <path d="M150 170C108 154 106 102 150 74C194 102 192 154 150 170Z" fill="${G}" fill-opacity=".85"/>
+      <path d="M150 166V92M150 132L130 116M150 118L170 102M150 148L170 134" stroke="${P}" stroke-width="1.6"/>
+    </svg>`,
+    tangible: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M140 82L198 115L140 148L82 115Z" fill="${A}" fill-opacity=".38"/>
+      <path d="M82 115L140 148V214L82 181Z" fill="${P}"/>
+      <path d="M140 148L198 115V181L140 214Z" fill="${A}" fill-opacity=".16"/>
+      <circle cx="170" cy="112" r="12" stroke="${A}" stroke-width="1.6"/>
+      <circle cx="170" cy="112" r="22" stroke="${A}" stroke-width="1.2" stroke-opacity=".6"/>
+      <circle cx="170" cy="112" r="32" stroke="${A}" stroke-width="1" stroke-opacity=".3"/>
+      <g transform="translate(172 106) rotate(38)"><rect x="-11" y="-96" width="22" height="98" rx="11" fill="${P}"/><rect x="-6.5" y="-20" width="13" height="13" rx="4" stroke-width="1.2"/></g>
+    </svg>`,
+    tolerancia: `<svg viewBox="0 0 300 250" fill="none" stroke="${G}" stroke-width="2" font-family="Jost,sans-serif" text-anchor="middle">
+      <defs><marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${G}" stroke="none"/></marker></defs>
+      <rect x="56" y="98" width="184" height="54" fill="${A}" fill-opacity=".22"/>
+      <ellipse cx="240" cy="125" rx="9" ry="27" fill="${P}"/>
+      <ellipse cx="56" cy="125" rx="9" ry="27" fill="${A}" fill-opacity=".22"/>
+      <path d="M30 125H275" stroke-width="1" stroke-dasharray="12 4 2 4"/>
+      <path d="M150 101V149" stroke-width="1.3" marker-start="url(#ad)" marker-end="url(#ad)"/>
+      <text x="150" y="80" font-size="20" fill="${G}" stroke="none">Ø 20 ± 0,1</text>
+      <rect x="84" y="182" width="132" height="30" rx="4" fill="${P}" stroke="${A}" stroke-width="1.2"/>
+      <text x="150" y="202" font-size="13" fill="${G}" stroke="none">19,9 ≤ Ø ≤ 20,1 mm</text>
     </svg>`
   };
 
   const words = [
-    {w:'algoritmo', syl:'al·go·rit·mo', cat:'sust. masc.',
+    {w:'algoritmo', cat:'sust. masc.',
      def:'Conjunto ordenado y finito de instrucciones que permite resolver un problema o realizar una tarea paso a paso.',
      etym:'del latín medieval <i>algorismus</i>, a partir del nombre del matemático persa al-Juarismi.',
      ex:'La aplicación usa un <em>algoritmo</em> para recomendarte canciones parecidas a las que ya escuchas.', fig:'Diagrama de flujo'},
-    {w:'artefacto', syl:'ar·te·fac·to', cat:'sust. masc.',
+    {w:'artefacto', cat:'sust. masc.',
      def:'Objeto fabricado con cierta técnica para cumplir una función; también, máquina o aparato, sobre todo si es grande o complicado.',
      etym:'del latín <i>arte factus</i>, «hecho con arte».',
      ex:'En el museo vimos un <em>artefacto</em> de bronce que servía para medir el paso de las estrellas.', fig:'Engranajes'},
-    {w:'fiable', syl:'fia·ble', cat:'adjetivo',
+    {w:'dato', cat:'sust. masc.',
+     def:'Información concreta, como un número, una medida o una palabra, que sirve para conocer algo o para que un programa la procese.',
+     etym:'del latín <i>datum</i>, «lo dado».',
+     ex:'El sensor de temperatura envía un <em>dato</em> nuevo a la placa Arduino cada segundo.', fig:'Tabla de valores'},
+    {w:'diseño', cat:'sust. masc.',
+     def:'Proceso de idear y planificar un objeto antes de fabricarlo, decidiendo su forma, su función y sus materiales. También, el resultado de ese proceso.',
+     etym:'del italiano <i>disegno</i>, «dibujo».',
+     ex:'Antes de cortar la madera, hicimos el <em>diseño</em> de la estructura en papel y a escala.', fig:'Plano acotado'},
+    {w:'error', cat:'sust. masc.',
+     def:'Acción, idea o resultado equivocado. En técnica, diferencia entre el valor medido o calculado y el valor real.',
+     etym:'del latín <i>error</i>, derivado de <i>errare</i>, «vagar, equivocarse».',
+     ex:'El programa no compilaba por un <em>error</em>: faltaba un punto y coma.', fig:'Código con fallo'},
+    {w:'fiable', cat:'adjetivo',
      def:'Que merece confianza. Dicho de una persona, una fuente o una máquina que funciona bien y da seguridad.',
      etym:'derivado de <i>fiar</i>, del latín vulgar <i>fidare</i>.',
      ex:'Es un coche viejo, pero muy <em>fiable</em>: nunca nos ha dejado tirados en la carretera.', fig:'Escudo de garantía'},
-    {w:'obsoleto', syl:'ob·so·le·to', cat:'adjetivo',
+    {w:'ingenio', cat:'sust. masc.',
+     def:'Capacidad para inventar, resolver problemas y encontrar soluciones nuevas con rapidez y creatividad.',
+     etym:'del latín <i>ingenium</i>, «talento natural».',
+     ex:'Con mucho <em>ingenio</em>, construyeron un puente resistente usando solo palillos y cola.', fig:'Bombilla y engranaje'},
+    {w:'obsoleto', cat:'adjetivo',
      def:'Anticuado o caído en desuso, porque ya no responde a las necesidades actuales o ha sido sustituido por algo mejor.',
      etym:'del latín <i>obsoletus</i>, «gastado, pasado de moda».',
      ex:'El disquete se quedó <em>obsoleto</em> cuando llegaron las memorias USB.', fig:'Disquete olvidado'},
-    {w:'viable', syl:'via·ble', cat:'adjetivo',
+    {w:'precisión', cat:'sust. fem.',
+     def:'Exactitud con que se hace, se mide o se expresa algo. En una medición, grado en que los resultados repetidos coinciden entre sí.',
+     etym:'del latín <i>praecisio</i>, «corte», derivado de <i>praecidere</i>, «cortar».',
+     ex:'Para medir la pieza con <em>precisión</em> usamos el calibre en lugar de la regla.', fig:'Diana'},
+    {w:'proyecto', cat:'sust. masc.',
+     def:'Plan detallado para realizar algo, con sus objetivos, pasos, materiales y plazos. En Tecnología, proceso que va de un problema a un objeto construido.',
+     etym:'del latín <i>proiectus</i>, «lanzado hacia delante».',
+     ex:'Este trimestre nuestro <em>proyecto</em> es un semáforo que funciona con Arduino.', fig:'Fases del proyecto'},
+    {w:'resiliencia', cat:'sust. fem.',
+     def:'Capacidad de una persona, un material o un sistema para soportar una situación adversa y recuperarse de ella.',
+     etym:'del inglés <i>resilience</i>, y este del latín <i>resilire</i>, «saltar hacia atrás, rebotar».',
+     ex:'La <em>resiliencia</em> del equipo se notó cuando, tras fallar el prototipo, lo rediseñaron en una semana.', fig:'Muelle que recupera'},
+    {w:'sostenible', cat:'adjetivo',
+     def:'Que puede mantenerse en el tiempo sin agotar los recursos ni dañar el medio ambiente.',
+     etym:'derivado de <i>sostener</i>, del latín <i>sustinere</i>.',
+     ex:'Construimos la maqueta con cartón reciclado para que fuera más <em>sostenible</em>.', fig:'Ciclo y hoja'},
+    {w:'tangible', cat:'adjetivo',
+     def:'Que se puede tocar. También, que se percibe de forma clara y concreta.',
+     etym:'del latín tardío <i>tangibilis</i>, derivado de <i>tangere</i>, «tocar».',
+     ex:'Al terminar, el esfuerzo se convirtió en algo <em>tangible</em>: un robot que funcionaba.', fig:'Objeto al tacto'},
+    {w:'tolerancia', cat:'sust. fem.',
+     def:'Margen de variación que se admite en una medida sin que la pieza deje de ser válida. También, respeto hacia las ideas de los demás.',
+     etym:'del latín <i>tolerantia</i>, derivado de <i>tolerare</i>, «soportar».',
+     ex:'El plano indica una <em>tolerancia</em> de ±0,1 mm en el diámetro del eje.', fig:'Eje acotado'},
+    {w:'viable', cat:'adjetivo',
      def:'Que, por sus circunstancias, tiene probabilidades de llevarse a cabo o de salir adelante.',
      etym:'del francés <i>viable</i>, derivado de <i>vie</i>, «vida».',
      ex:'Después de revisar los costes, el equipo concluyó que el proyecto era <em>viable</em>.', fig:'Brote que crece'}
   ];
+  const roman = n => [['X',10],['IX',9],['V',5],['IV',4],['I',1]].reduce((s,[r,v])=>{while(n>=v){s+=r;n-=v;}return s;},'');
 
   const book = document.getElementById('book');
   const orn = '<svg class="orn" viewBox="0 0 120 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M0 7h46M74 7h46"/><path d="M60 1l6 6-6 6-6-6z"/><circle cx="50" cy="7" r="1.6" fill="currentColor"/><circle cx="70" cy="7" r="1.6" fill="currentColor"/></svg>';
@@ -366,14 +500,14 @@ body.single .hint{font-size:11px}
       <div class="runhead"><span>${o.w.toUpperCase()}</span><b>${i+1} / ${words.length}</b></div>
       <div class="illus">
         <div class="plate" role="img" aria-label="Ilustración: ${o.fig}">${art[o.w]}</div>
-        <span class="fig">LÁM. ${['I','II','III','IV','V'][i]} · ${o.fig.toUpperCase()}</span>
+        <span class="fig">LÁM. ${roman(i+1)} · ${o.fig.toUpperCase()}</span>
         <div class="example"><span class="lbl">EJEMPLO</span><p>«${o.ex}»</p></div>
       </div></div><span class="folio">${2*i+3}</span>`;
   const indexPage = `<div class="inner index">
       <div class="runhead"><span>DICCIONARIO</span><b>ÍNDICE</b></div>
       <div class="entry" style="justify-content:flex-start;padding-top:36px;gap:0">
         <h2>Índice</h2>
-        <p class="sub">Cinco palabras, de la A a la V</p>
+        <p class="sub">Quince palabras, de la A a la V</p>
         <ol>${words.map((o,i)=>`<li><button type="button" data-go="${i+2}"><span class="w">${o.w}</span><span class="dots"></span><span class="pg">${2*i+2}</span></button></li>`).join('')}</ol>
       </div></div><span class="folio">1</span>`;
 
@@ -427,7 +561,7 @@ body.single .hint{font-size:11px}
       prev=a;
     }
   }
-  addLeaf(`<div class="frame"></div><div class="seal" role="img" aria-label="Logo del IES Palomares"><svg class="logo" viewBox="0 0 1000 1000" aria-hidden="true"><defs><linearGradient id="gf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8843c"/><stop offset=".3" stop-color="#ecd38e"/><stop offset=".48" stop-color="#c8a55a"/><stop offset=".62" stop-color="#f3dea0"/><stop offset=".82" stop-color="#b08a3e"/><stop offset="1" stop-color="#d9bb72"/></linearGradient><path id="arcT" d="M88 500A412 412 0 0 1 912 500"/><path id="arcB" d="M42 500A458 458 0 0 0 958 500"/></defs><g fill="url(#gf)" stroke="url(#gf)"><circle cx="500" cy="500" r="494" fill="none" stroke-width="7"/><circle cx="500" cy="500" r="362" fill="none" stroke-width="5"/><circle cx="70" cy="500" r="11" stroke="none"/><circle cx="930" cy="500" r="11" stroke="none"/><path fill-rule="evenodd" stroke="none" d="M504 751 L472 750 L451 747 L433 742 L421 739 L403 732 L378 719 L349 700 L330 682 L311 659 L296 635 L288 614 L284 604 L279 580 L278 561 L278 305 L278 300 L282 297 L288 296 L714 296 L718 297 L721 299 L722 304 L722 561 L720 578 L715 603 L710 618 L703 633 L688 658 L678 672 L666 685 L642 705 L617 722 L583 737 L564 743 L528 750 L504 751Z M527 674 L526 647 L514 499 L517 495 L635 402 L638 398 L635 396 L524 391 L516 395 L459 444 L451 449 L445 448 L422 438 L390 426 L385 428 L379 433 L360 452 L360 454 L362 456 L384 457 L389 460 L391 466 L392 492 L396 502 L499 608 L501 614 L499 636 L522 671 L525 674 L527 674Z"/><g stroke="none" font-family="Cormorant Garamond,Georgia,serif" font-weight="600" font-size="66" letter-spacing="7"><text text-anchor="middle"><textPath href="#arcT" startOffset="50%">SCIENTIA LAETITIA NOSTRA</textPath></text><text text-anchor="middle" letter-spacing="13"><textPath href="#arcB" startOffset="50%">I.E.S. PALOMARES</textPath></text></g></g></svg></div><h1>Diccionario</h1>${orn}<p>cinco palabras, cinco láminas</p>`,'cover',
+  addLeaf(`<div class="frame"></div><div class="seal" role="img" aria-label="Logo del IES Palomares"><svg class="logo" viewBox="0 0 1000 1000" aria-hidden="true"><defs><linearGradient id="gf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8843c"/><stop offset=".3" stop-color="#ecd38e"/><stop offset=".48" stop-color="#c8a55a"/><stop offset=".62" stop-color="#f3dea0"/><stop offset=".82" stop-color="#b08a3e"/><stop offset="1" stop-color="#d9bb72"/></linearGradient><path id="arcT" d="M88 500A412 412 0 0 1 912 500"/><path id="arcB" d="M42 500A458 458 0 0 0 958 500"/></defs><g fill="url(#gf)" stroke="url(#gf)"><circle cx="500" cy="500" r="494" fill="none" stroke-width="7"/><circle cx="500" cy="500" r="362" fill="none" stroke-width="5"/><circle cx="70" cy="500" r="11" stroke="none"/><circle cx="930" cy="500" r="11" stroke="none"/><path fill-rule="evenodd" stroke="none" d="M504 751 L472 750 L451 747 L433 742 L421 739 L403 732 L378 719 L349 700 L330 682 L311 659 L296 635 L288 614 L284 604 L279 580 L278 561 L278 305 L278 300 L282 297 L288 296 L714 296 L718 297 L721 299 L722 304 L722 561 L720 578 L715 603 L710 618 L703 633 L688 658 L678 672 L666 685 L642 705 L617 722 L583 737 L564 743 L528 750 L504 751Z M527 674 L526 647 L514 499 L517 495 L635 402 L638 398 L635 396 L524 391 L516 395 L459 444 L451 449 L445 448 L422 438 L390 426 L385 428 L379 433 L360 452 L360 454 L362 456 L384 457 L389 460 L391 466 L392 492 L396 502 L499 608 L501 614 L499 636 L522 671 L525 674 L527 674Z"/><g stroke="none" font-family="Cormorant Garamond,Georgia,serif" font-weight="600" font-size="66" letter-spacing="7"><text text-anchor="middle"><textPath href="#arcT" startOffset="50%">SCIENTIA LAETITIA NOSTRA</textPath></text><text text-anchor="middle" letter-spacing="13"><textPath href="#arcB" startOffset="50%">I.E.S. PALOMARES</textPath></text></g></g></svg></div><h1>Diccionario</h1>${orn}<p>quince palabras, quince láminas</p>`,'cover',
           `<div class="label">Este diccionario pertenece a<br>· · · · · · · · · · · ·<small>MMXXVI</small></div>`,'endpaper');
   addLeaf(indexPage,'page', leftPage(words[0],0),'page');
   for(let i=0;i<words.length;i++){
