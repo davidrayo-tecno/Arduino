@@ -207,6 +207,31 @@ body.single .hint{font-size:11px}
 }
 .endpaper .label small{display:block;font-family:var(--font-display);font-style:normal;letter-spacing:.2em;font-size:11px;margin-top:6px;color:#9a8a68}
 
+.rel{margin:4px 0 0;display:flex;flex-direction:column;gap:8px;border-left:2px solid var(--gold);padding-left:14px}
+.rel div{display:flex;flex-direction:column;gap:1px}
+.rel dt{font-family:var(--font-display);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink)}
+.rel dd{margin:0;font-family:var(--font-serif);font-style:italic;font-size:19px;line-height:1.3;color:var(--page-ink)}
+body.single .rel dt{font-size:13px}
+body.single .rel dd{font-size:21px}
+/* pestañas del canto (ordenador) */
+.tabs{position:absolute;top:18px;left:calc(100% + 12px);display:flex;flex-direction:column;gap:4px;z-index:3000}
+.tab{all:unset;box-sizing:border-box;cursor:pointer;width:30px;height:44px;display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--cloth);
+  background:linear-gradient(90deg,#d9cdb3,#efe6d1);border-radius:0 7px 7px 0;
+  box-shadow:1px 1px 2px rgba(0,0,0,.18);transition:transform .15s,background .2s,color .2s}
+.tab:hover{transform:translateX(3px)}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.tab[aria-current="true"]{background:linear-gradient(90deg,#b8913f,#d9bb72);color:#fff;transform:translateX(4px)}
+.book.closed-back .tabs{display:none}
+body.single .tabs{display:none}
+/* fila de letras (móvil) */
+.alpha{display:none;gap:3px;justify-content:center;flex-wrap:nowrap;width:100%}
+body.single .alpha{display:flex}
+.alpha button{all:unset;box-sizing:border-box;cursor:pointer;flex:1;max-width:32px;height:30px;display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--ink);
+  border:1px solid var(--btn-line);border-radius:6px;background:var(--btn)}
+.alpha button[aria-current="true"]{background:var(--gold);border-color:var(--gold);color:#fff}
+.alpha button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 .controls{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center}
 .controls button{
   font-family:var(--font-ui);font-size:14px;color:var(--ink);background:var(--btn);
@@ -225,6 +250,7 @@ body.single .hint{font-size:11px}
 
 </head>
 <body>
+<nav class="alpha" id="alpha" aria-label="Ir a la letra"></nav>
 <div class="stage" id="stage">
   <div class="scaler" id="scaler">
     <div class="book" id="book">
@@ -415,49 +441,49 @@ body.single .hint{font-size:11px}
   };
 
   const words = [
-    {w:'algoritmo', cat:'sust. masc.',
+    {w:'algoritmo', sin:'procedimiento, método, secuencia de pasos', ant:'', cat:'sust. masc.',
      def:'Conjunto ordenado de pasos que permite resolver un problema o realizar una tarea.',
      ex:'La aplicación usa un <em>algoritmo</em> para recomendarte canciones parecidas a las que ya escuchas.', fig:'Diagrama de flujo'},
-    {w:'artefacto', cat:'sust. masc.',
+    {w:'artefacto', sin:'aparato, dispositivo, artilugio, máquina', ant:'', cat:'sust. masc.',
      def:'Objeto fabricado por las personas para un fin determinado. También, máquina o aparato, sobre todo si es grande o complicado.',
      ex:'En el museo vimos un <em>artefacto</em> de bronce que servía para medir el paso de las estrellas.', fig:'Engranajes'},
-    {w:'dato', cat:'sust. masc.',
+    {w:'dato', sin:'información, valor, cifra', ant:'', cat:'sust. masc.',
      def:'Información concreta que permite conocer algo o llegar a una conclusión.',
      ex:'El sensor de temperatura envía un <em>dato</em> nuevo a la placa Arduino cada segundo.', fig:'Tabla de valores'},
-    {w:'diseño', cat:'sust. masc.',
+    {w:'diseño', sin:'plan, boceto, esbozo, proyecto', ant:'improvisación', cat:'sust. masc.',
      def:'Plan o dibujo con el que se idea un objeto antes de fabricarlo. También, la forma y el aspecto que tiene ese objeto.',
      ex:'Antes de cortar la madera, hicimos el <em>diseño</em> de la estructura en papel y a escala.', fig:'Plano acotado'},
-    {w:'error', cat:'sust. masc.',
+    {w:'error', sin:'fallo, equivocación, desacierto', ant:'acierto', cat:'sust. masc.',
      def:'Idea, acción o juicio equivocado.',
      ex:'El programa no compilaba por un <em>error</em>: faltaba un punto y coma.', fig:'Código con fallo'},
-    {w:'fiable', cat:'adjetivo',
+    {w:'fiable', sin:'seguro, fidedigno, de confianza', ant:'dudoso, inseguro', cat:'adjetivo',
      def:'Que merece confianza o funciona con seguridad.',
      ex:'Es un coche viejo, pero muy <em>fiable</em>: nunca nos ha dejado tirados en la carretera.', fig:'Escudo de garantía'},
-    {w:'ingenio', cat:'sust. masc.',
+    {w:'ingenio', sin:'inventiva, creatividad, talento', ant:'torpeza', cat:'sust. masc.',
      def:'Capacidad para inventar cosas o encontrar soluciones con facilidad y creatividad.',
      ex:'Con mucho <em>ingenio</em>, construyeron un puente resistente usando solo palillos y cola.', fig:'Bombilla y engranaje'},
-    {w:'obsoleto', cat:'adjetivo',
+    {w:'obsoleto', sin:'anticuado, desfasado, caduco', ant:'moderno, actual', cat:'adjetivo',
      def:'Anticuado o que ha dejado de usarse porque ya no sirve o ha sido sustituido por algo mejor.',
      ex:'El disquete se quedó <em>obsoleto</em> cuando llegaron las memorias USB.', fig:'Disquete olvidado'},
-    {w:'precisión', cat:'sust. fem.',
+    {w:'precisión', sin:'exactitud, rigor', ant:'imprecisión, inexactitud', cat:'sust. fem.',
      def:'Exactitud y cuidado con que se hace, se mide o se dice algo.',
      ex:'Para medir la pieza con <em>precisión</em> usamos el calibre en lugar de la regla.', fig:'Diana'},
-    {w:'proyecto', cat:'sust. masc.',
+    {w:'proyecto', sin:'plan, propósito, programa', ant:'', cat:'sust. masc.',
      def:'Plan que se prepara para hacer algo, con los pasos y los medios necesarios para conseguirlo.',
      ex:'Este trimestre nuestro <em>proyecto</em> es un semáforo que funciona con Arduino.', fig:'Fases del proyecto'},
-    {w:'resiliencia', cat:'sust. fem.',
+    {w:'resiliencia', sin:'fortaleza, entereza, resistencia', ant:'fragilidad', cat:'sust. fem.',
      def:'Capacidad para superar una situación difícil y recuperarse de ella.',
      ex:'La <em>resiliencia</em> del equipo se notó cuando, tras fallar el prototipo, lo rediseñaron en una semana.', fig:'Muelle que recupera'},
-    {w:'sostenible', cat:'adjetivo',
+    {w:'sostenible', sin:'ecológico, respetuoso, duradero', ant:'insostenible, contaminante', cat:'adjetivo',
      def:'Que puede mantenerse en el tiempo sin agotar los recursos ni dañar el medio ambiente.',
      ex:'Construimos la maqueta con cartón reciclado para que fuera más <em>sostenible</em>.', fig:'Ciclo y hoja'},
-    {w:'tangible', cat:'adjetivo',
+    {w:'tangible', sin:'palpable, concreto, material', ant:'intangible, abstracto', cat:'adjetivo',
      def:'Que se puede tocar o percibir con claridad.',
      ex:'Al terminar, el esfuerzo se convirtió en algo <em>tangible</em>: un robot que funcionaba.', fig:'Objeto al tacto'},
-    {w:'tolerancia', cat:'sust. fem.',
+    {w:'tolerancia', sin:'respeto, comprensión, transigencia', ant:'intolerancia, intransigencia', cat:'sust. fem.',
      def:'Respeto hacia las ideas, opiniones o costumbres de los demás, aunque no coincidan con las propias.',
      ex:'En el debate practicamos la <em>tolerancia</em> escuchando opiniones distintas a la nuestra.', fig:'Dos opiniones'},
-    {w:'viable', cat:'adjetivo',
+    {w:'viable', sin:'factible, posible, realizable', ant:'inviable, imposible', cat:'adjetivo',
      def:'Que tiene probabilidades de llevarse a cabo o de salir adelante.',
      ex:'Después de revisar los costes, el equipo concluyó que el proyecto era <em>viable</em>.', fig:'Brote que crece'}
   ];
@@ -475,6 +501,7 @@ body.single .hint{font-size:11px}
         <div class="meta"><span class="cat">${o.cat}</span></div>
         <div class="rule"></div>
         <p class="def">${o.def}</p>
+        <dl class="rel"><div><dt>Sinónimos</dt><dd>${o.sin}</dd></div>${o.ant?`<div><dt>Antónimos</dt><dd>${o.ant}</dd></div>`:''}</dl>
       </div></div><span class="folio">${2*i+2}</span>`;
   const rightPage = (o,i)=>`<div class="inner">
       <div class="runhead"><span>${o.w.toUpperCase()}</span><b>${i+1} / ${words.length}</b></div>
@@ -611,7 +638,20 @@ body.single .hint{font-size:11px}
   const stage=document.getElementById('stage'), scaler=document.getElementById('scaler');
   let single=false, side='R', scale=1;
 
+  // pestañas por letra
+  const letters=[]; words.forEach((o,i)=>{const L=o.w[0].toUpperCase(); if(!letters.find(x=>x.L===L)) letters.push({L,go:i+2});});
+  const tabs=document.createElement('div'); tabs.className='tabs';
+  tabs.innerHTML=letters.map(x=>`<button type="button" class="tab" data-go="${x.go}" data-l="${x.L}" aria-label="Letra ${x.L}">${x.L}</button>`).join('');
+  book.appendChild(tabs);
+  const alpha=document.getElementById('alpha');
+  alpha.innerHTML=letters.map(x=>`<button type="button" data-go="${x.go}" data-l="${x.L}" aria-label="Letra ${x.L}">${x.L}</button>`).join('');
+  alpha.addEventListener('click',e=>{const b=e.target.closest('[data-go]'); if(b) goTo(+b.dataset.go);});
+  function markLetter(){
+    const L = current>=2 && current-2<words.length ? words[current-2].w[0].toUpperCase() : '';
+    document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-current', b.dataset.l===L));
+  }
   function render(){
+    markLetter();
     zfix();
     book.classList.toggle('closed-front', current===0);
     book.classList.toggle('closed-back', current===N);
@@ -754,7 +794,7 @@ body.single .hint{font-size:11px}
     document.body.classList.toggle('single', single);
     let H;
     if(single){
-      const ctr=document.querySelector('.controls').offsetHeight + document.getElementById('hint').offsetHeight;
+      const ctr=document.querySelector('.controls').offsetHeight + document.getElementById('hint').offsetHeight + document.getElementById('alpha').offsetHeight + 8;
       const avail = vh - ctr - 8*2 - 16;
       const pw = 380;
       scale = Math.min(1.25, vw/(pw+20));
@@ -765,7 +805,7 @@ body.single .hint{font-size:11px}
     } else {
       relayout(460, 620);
       H = PH + 70;
-      scale = Math.max(.3, Math.min(1, vw/(920+48), (vh-170)/H));
+      scale = Math.max(.3, Math.min(1, vw/(920+110), (vh-170)/H));
     }
     stage.style.height=(H*scale)+'px';
     document.getElementById('hint').textContent = single
