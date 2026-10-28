@@ -2,14 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="only light">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Pequeño Diccionario</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500&display=swap">
 <style>
 /* Layout: diccionario de tela verde con cantos dorados sobre un escritorio; cada palabra ocupa una doble página (izquierda definición, derecha ilustración y ejemplo) */
 :root{
+  color-scheme:only light;
   --desk:#e7e3dc;
   --desk-2:#d8d2c7;
   --ink:#2b2a27;
@@ -46,7 +48,7 @@ body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
   overflow-x:hidden;
 }
-html{overflow-x:clip}
+html{overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .stage{width:100%;max-width:1040px;position:relative;overflow-x:clip}
 .scaler{transition:transform .55s cubic-bezier(.4,0,.2,1)}
 body.single .stage{clip-path:inset(-60px 0 -90px 0)}
@@ -139,9 +141,9 @@ body.single .hint{font-size:11px}
 }
 .front .folio{right:40px}.back .folio{left:40px}
 
-.entry{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.entry{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;justify-content:safe center;gap:14px}
 .initial{font-family:var(--font-display);font-size:120px;line-height:.8;color:var(--gold);opacity:.35;margin:0 0 -18px}
-.word{font-family:var(--font-display);font-weight:700;font-size:64px;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.word{font-family:var(--font-serif);font-weight:700;font-size:64px;line-height:1;margin:0;letter-spacing:0;text-wrap:balance}
 .meta{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;font-family:var(--font-serif);font-size:19px;color:var(--page-muted)}
 .meta .syl{letter-spacing:.06em}
 .meta .cat{font-style:italic;color:var(--gold-ink)}
@@ -149,7 +151,7 @@ body.single .hint{font-size:11px}
 .def{font-family:var(--font-serif);font-size:23px;line-height:1.4;margin:0;max-width:30ch}
 .def .n{font-weight:600;color:var(--gold-ink);margin-right:6px}
 
-.illus{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.illus{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;justify-content:safe center;gap:22px}
 .plate{
   width:100%;max-width:300px;aspect-ratio:300/250;
   border:1px solid #d9d1c0;outline:1px solid #e8e1d2;outline-offset:6px;
@@ -812,9 +814,29 @@ body.single .alpha{display:flex}
       ? 'Toca los bordes o desliza para pasar página'
       : 'Arrastra una página para pasarla, haz clic en ella o usa las flechas del teclado';
     render();
+    autofit();
+  }
+  // Si el texto de una página no cabe (por ejemplo, con la letra del móvil agrandada), se reduce solo
+  function autofit(){
+    const items=[...book.querySelectorAll('.inner > .entry, .inner > .illus')];
+    items.forEach(el=>{ el.style.transform=''; el.style.width=''; el.style.height=''; el.style.flex=''; });
+    const meas=items.map(el=>[el.clientHeight, el.scrollHeight]);
+    items.forEach((el,i)=>{
+      const [a,h]=meas[i];
+      if(!(a>0 && h>a+1)) return;
+      let k=a/h;
+      for(let n=0;n<3;n++){
+        el.style.flex='none'; el.style.transformOrigin='top left';
+        el.style.transform=`scale(${k})`; el.style.width=`${100/k}%`; el.style.height=`${a/k}px`;
+        const h2=el.scrollHeight, room=a/k;
+        if(h2<=room+1) break;
+        k=k*room/h2;
+      }
+    });
   }
   window.addEventListener('resize',fit);
   fit(); fit();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();
 </script>
 
